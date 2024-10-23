@@ -1,8 +1,8 @@
 #pragma once
 
+#include <condition_variable>
 #include <pqxx/pqxx>
 #include <mutex>
-#include <condition_variable>
 
 namespace connection_pool {
 

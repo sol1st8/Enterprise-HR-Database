@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.11)
 
-project(http_server CXX)
+project(db CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
 conan_basic_setup(TARGETS)
 
-add_executable(http_server src/main.cpp src/http_server.h src/http_server.cpp)
+add_executable(db src/app/use_cases.h src/app/use_cases_impl.cpp src/app/use_cases_impl.h src/connection_pool.h src/db.h src/db.cpp src/domain/department.h
+               src/domain/department_fwd.h src/main.cpp src/postgres/postgres.h src/postgres/postgres.cpp src/ui/view.h src/domain/worker.h)
 
 set(THREAD_PREFER_PTHREAD_FLAG_ON)
 find_package(Threads REQUIRED)
@@ -17,7 +18,7 @@ else()
   set(SYSTEM_LIBS)
 endif()
 
-target_include_directories(http_server PRIVATE CONAN_PKG::boost)
-target_link_libraries(http_server PRIVATE Threads::Threads CONAN_PKG::boost)
+target_include_directories(db PRIVATE CONAN_PKG::boost CONAN_PKG:libpqxx)
+target_link_libraries(db PRIVATE Threads::Threads CONAN_PKG::boost CONAN_PKG::libpqxx)
 
-target_link_libraries(http_server ${SYSTEM_LIBS})
+target_link_libraries(db ${SYSTEM_LIBS})
