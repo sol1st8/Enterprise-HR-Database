@@ -12,14 +12,14 @@ class UseCases;
 namespace ui {
 
 namespace detail {
-/*
-struct JobTitle {
-    std::string id;
+
+struct JobTitleInfo {
+    int id;
     std::string job_title;
 
-    bool operator==(const JobTitle&) const = default;
+    bool operator==(const JobTitleInfo&) const = default;
 };
-
+/*
 struct BusinessTrip {
     std::string id;
     std::string country;

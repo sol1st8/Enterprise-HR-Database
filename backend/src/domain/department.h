@@ -43,9 +43,9 @@ class Department {
 
 class DepartmentRepository {
   public:
-    virtual std::vector<ui::detail::DepartmentInfo> Get() = 0;
+    virtual std::vector<ui::detail::DepartmentInfo> Get() const = 0;
 
-    virtual std::shared_ptr<domain::Worker> GetWorker() = 0;
+    virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 
   protected:
     ~DepartmentRepository() = default;

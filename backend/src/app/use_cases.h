@@ -8,7 +8,7 @@ namespace ui {
 
 namespace detail {
 
-//struct JobTitle;
+struct JobTitleInfo;
 //struct BusinessTrip;
 struct DepartmentInfo;
 //struct Vacation;
@@ -26,16 +26,21 @@ namespace app {
 
 class UseCases {
   public:
-    //virtual void AddJobTitle(const std::string& job_title) = 0;
-    //virtual std::vector<ui::detail::JobTitle> GetJobTitles() = 0;
+    virtual void AddJobTitle(const ui::detail::JobTitleInfo& job_title) = 0;
+    virtual void DeleteJobTitle(const ui::detail::JobTitleInfo& job_title) = 0;
+    virtual void UpdateJobTitle(const ui::detail::JobTitleInfo& job_title) = 0;
+    virtual std::vector<ui::detail::JobTitleInfo> GetJobTitles() const = 0;
 
     /*virtual void AddBusinessTrip(const std::string& country, const std::string& city,
                                  const std::string& organization, const std::string& from_date,
                                  const std::string& to_date, int days, const std::string& target) = 0;
     virtual std::vector<ui::detail::BusinessTrip> GetBusinessTrips() = 0;
     */
-    virtual void AddDepartment(ui::detail::DepartmentInfo& dep) = 0;
-    virtual std::vector<ui::detail::DepartmentInfo> GetDepartments() = 0;
+
+    virtual void AddDepartment(const ui::detail::DepartmentInfo& dep) = 0;
+    virtual void DeleteDepartment(const ui::detail::DepartmentInfo& dep) = 0;
+    virtual void UpdateDepartment(const ui::detail::DepartmentInfo& dep) = 0;
+    virtual std::vector<ui::detail::DepartmentInfo> GetDepartments() const = 0;
 
   protected:
     ~UseCases() = default;

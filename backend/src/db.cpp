@@ -12,10 +12,15 @@ Application::Application(const AppConfig& config)
     : db_(config.db_url) {}
 
 void Application::Run() {
-    ui::detail::DepartmentInfo dep{16, 16, "Отдел бухгалтерии", 116};
-    use_cases_.AddDepartment(dep);
-    for (auto& dep : use_cases_.GetDepartments()) {
-        std::cout << dep.id << ' ' << dep.manager_personal_num << ' ' << dep.dep_name<< ' ' << dep.office_num << std::endl;
+    ui::detail::JobTitleInfo job_title{16, "Слесарь"s};
+    use_cases_.AddJobTitle(job_title);
+    for (auto& j_title : use_cases_.GetJobTitles()) {
+        std::cout << j_title.id << ' ' << j_title.job_title << std::endl;
+    }
+    use_cases_.DeleteJobTitle(job_title);
+    std::cout << '\n';
+    for (auto& j_title : use_cases_.GetJobTitles()) {
+        std::cout << j_title.id << ' ' << j_title.job_title << std::endl;
     }
 }
 
