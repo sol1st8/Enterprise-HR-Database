@@ -63,6 +63,13 @@ struct Vacation {
     bool operator==(const Vacation&) const = default;
 };
 */
+struct StaffingTableInfo {
+    int staffing_table_id;
+    int job_title_id;
+    int department_id;
+    int salary;
+    int time_job = 1;
+};
 } // namespace detail
 
 } // namespace ui

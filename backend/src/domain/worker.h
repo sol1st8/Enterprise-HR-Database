@@ -2,6 +2,7 @@
 
 #include "department.h"
 #include "job_title.h"
+#include "staffing_table.h"
 #include "time_sheet.h"
 #include "../ui/view.h"
 
@@ -18,6 +19,10 @@ class Worker {
     virtual void AddDepartment(const domain::Department& dep) = 0;
     virtual void DeleteDepartment(const domain::Department& dep) = 0;
     virtual void UpdateDepartment(const domain::Department& dep) = 0;
+
+    virtual void AddStaffingTable(const domain::StaffingTable& staffing_table) = 0;
+    virtual void DeleteStaffingTable(const domain::StaffingTable& staffing_table) = 0;
+    virtual void UpdateStaffingTable(const domain::StaffingTable& staffing_table) = 0;
 
     virtual void AddTimeSheet(const domain::TimeSheet& time_sheet) = 0;
     virtual void DeleteTimeSheet(const domain::TimeSheet& time_sheet) = 0;

@@ -1,6 +1,3 @@
-#include "../domain/department.h"
-#include "../domain/job_title.h"
-#include "../domain/time_sheet.h"
 #include "postgres.h"
 #include "../ui/view.h"
 
@@ -10,6 +7,24 @@
 namespace postgres {
 using namespace std::literals;
 using pqxx::operator"" _zv;
+
+std::vector<ui::detail::DepartmentInfo> DepartmentRepositoryImpl::Get() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT * FROM Отдел;";
+
+    auto resp = tr.query<int, int, std::string, int>(query);
+
+    std::vector<ui::detail::DepartmentInfo> result;
+
+    for (auto& [id, manager_personal_number, dep_name, office_num] : resp) {
+        ui::detail::DepartmentInfo department{id, manager_personal_number, dep_name, office_num};
+        result.push_back(department);
+    }
+
+    return result;
+}
 
 std::vector<ui::detail::JobTitleInfo> JobTitleRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
@@ -29,19 +44,19 @@ std::vector<ui::detail::JobTitleInfo> JobTitleRepositoryImpl::Get() const {
     return result;
 }
 
-std::vector<ui::detail::DepartmentInfo> DepartmentRepositoryImpl::Get() const {
+std::vector<ui::detail::StaffingTableInfo> StaffingTableRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Отдел;";
+    std::string query = "SELECT * FROM ШтатноеРасписание;";
 
-    auto resp = tr.query<int, int, std::string, int>(query);
+    auto resp = tr.query<int, int, int, int, int>(query);
 
-    std::vector<ui::detail::DepartmentInfo> result;
+    std::vector<ui::detail::StaffingTableInfo> result;
 
-    for (auto& [id, manager_personal_number, dep_name, office_num] : resp) {
-        ui::detail::DepartmentInfo department{id, manager_personal_number, dep_name, office_num};
-        result.push_back(department);
+    for (auto& [staffing_table_id, job_title_id, department_id, time_job, salary] : resp) {
+        ui::detail::StaffingTableInfo staffing_table{staffing_table_id, job_title_id, department_id, salary, time_job};
+        result.push_back(staffing_table);
     }
 
     return result;
@@ -70,9 +85,34 @@ DataBase::DataBase(const std::string& db_url)
   [&db_url](){ return std::make_shared<pqxx::connection>(db_url); } }
     , deps_{pool_}
     , job_titles_{pool_}
+    , staffing_table_{pool_}
     , time_sheet_{pool_} {}
 
 WorkerImpl::WorkerImpl(pqxx::connection& conn) : conn_(conn), work_(conn) {}
+
+void WorkerImpl::AddDepartment(const domain::Department& dep) {
+    work_.exec_params(
+        R"(
+    INSERT INTO Отдел (КодОтдела, ТабельныйНомерРуководителя, Название, НомерКабинета) VALUES ($1, $2, $3, $4);
+    )"_zv,
+        dep.GetDepartmentId(), dep.GetManagerPersonalNum(), dep.GetDepName(), dep.GetOfficeNum());
+}
+
+void WorkerImpl::DeleteDepartment(const domain::Department& dep) {
+    work_.exec_params(
+        R"(
+    DELETE FROM Отдел WHERE КодОтдела=$1;
+    )"_zv,
+        dep.GetDepartmentId());
+}
+
+void WorkerImpl::UpdateDepartment(const domain::Department& dep) {
+    work_.exec_params(
+        R"(
+    UPDATE Отдел SET КодОтдела=КодОтдела + 1 WHERE КодОтдела=$1;
+    )"_zv,
+        dep.GetDepartmentId());
+}
 
 void WorkerImpl::AddJobTitle(const domain::JobTitle& job_title) {
     work_.exec_params(
@@ -98,28 +138,29 @@ void WorkerImpl::UpdateJobTitle(const domain::JobTitle& job_title) {
         job_title.GetJobTitleId());
 }
 
-void WorkerImpl::AddDepartment(const domain::Department& dep) {
+void WorkerImpl::AddStaffingTable(const domain::StaffingTable& staffing_table) {
     work_.exec_params(
         R"(
-    INSERT INTO Отдел (КодОтдела, ТабельныйНомерРуководителя, Название, НомерКабинета) VALUES ($1, $2, $3, $4);
+    INSERT INTO ШтатноеРасписание (НомерЗаписи, КодДолжности, КодОтдела, КоличествоСтавок, Оклад) VALUES ($1, $2, $3, $4, $5);
     )"_zv,
-        dep.GetDepartmentId(), dep.GetManagerPersonalNum(), dep.GetDepName(), dep.GetOfficeNum());
+        staffing_table.GetStaffingTableId(), staffing_table.GetJobTitleId(), staffing_table.GetDepartmentId(),
+        staffing_table.GetTimeJob(), staffing_table.GetSalary());
 }
 
-void WorkerImpl::DeleteDepartment(const domain::Department& dep) {
+void WorkerImpl::DeleteStaffingTable(const domain::StaffingTable& staffing_table) {
     work_.exec_params(
         R"(
-    DELETE FROM Отдел WHERE КодОтдела=$1;
+    DELETE FROM ШтатноеРасписание WHERE НомерЗаписи=$1;
     )"_zv,
-        dep.GetDepartmentId());
+        staffing_table.GetStaffingTableId());
 }
 
-void WorkerImpl::UpdateDepartment(const domain::Department& dep) {
+void WorkerImpl::UpdateStaffingTable(const domain::StaffingTable& staffing_table) {
     work_.exec_params(
         R"(
-    UPDATE Отдел SET КодОтдела=КодОтдела + 1 WHERE КодОтдела=$1;
+    UPDATE ШтатноеРасписание SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
     )"_zv,
-        dep.GetDepartmentId());
+        staffing_table.GetStaffingTableId());
 }
 
 void WorkerImpl::AddTimeSheet(const domain::TimeSheet& time_sheet) {

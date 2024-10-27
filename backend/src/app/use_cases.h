@@ -16,7 +16,7 @@ struct DepartmentInfo;
 //struct СompositionBusinessTrip;
 //struct Employee;
 struct TimeSheetInfo;
-//struct StaffingTable;
+struct StaffingTableInfo;
 
 } // namespace detail
 
@@ -26,6 +26,11 @@ namespace app {
 
 class UseCases {
   public:
+    virtual void AddDepartment(const ui::detail::DepartmentInfo& dep) = 0;
+    virtual void DeleteDepartment(const ui::detail::DepartmentInfo& dep) = 0;
+    virtual void UpdateDepartment(const ui::detail::DepartmentInfo& dep) = 0;
+    virtual std::vector<ui::detail::DepartmentInfo> GetDepartments() const = 0;
+
     virtual void AddJobTitle(const ui::detail::JobTitleInfo& job_title) = 0;
     virtual void DeleteJobTitle(const ui::detail::JobTitleInfo& job_title) = 0;
     virtual void UpdateJobTitle(const ui::detail::JobTitleInfo& job_title) = 0;
@@ -37,10 +42,10 @@ class UseCases {
     virtual std::vector<ui::detail::BusinessTrip> GetBusinessTrips() = 0;
     */
 
-    virtual void AddDepartment(const ui::detail::DepartmentInfo& dep) = 0;
-    virtual void DeleteDepartment(const ui::detail::DepartmentInfo& dep) = 0;
-    virtual void UpdateDepartment(const ui::detail::DepartmentInfo& dep) = 0;
-    virtual std::vector<ui::detail::DepartmentInfo> GetDepartments() const = 0;
+    virtual void AddStaffingTable(const ui::detail::StaffingTableInfo& staffing_table) = 0;
+    virtual void DeleteStaffingTable(const ui::detail::StaffingTableInfo& staffing_table) = 0;
+    virtual void UpdateStaffingTable(const ui::detail::StaffingTableInfo& staffing_table) = 0;
+    virtual std::vector<ui::detail::StaffingTableInfo> GetStaffingTable() const = 0;
 
     virtual void AddTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) = 0;
     virtual void DeleteTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) = 0;

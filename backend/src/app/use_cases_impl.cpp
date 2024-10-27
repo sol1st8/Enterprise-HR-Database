@@ -6,9 +6,32 @@
 namespace app {
 
 UseCasesImpl::UseCasesImpl(domain::DepartmentRepository& deps, domain::JobTitleRepository& job_titles,
-                           domain::TimeSheetRepository& time_sheet) : deps_(deps)
-                                                                    , job_titles_{job_titles}
-                                                                    , time_sheet_{time_sheet} {}
+                           domain::StaffingTableRepository& staffing_table, domain::TimeSheetRepository& time_sheet) : deps_(deps)
+                                                                                                                     , job_titles_{job_titles}
+                                                                                                                     , staffing_table_{staffing_table}
+                                                                                                                     , time_sheet_{time_sheet} {}
+
+void UseCasesImpl::AddDepartment(const ui::detail::DepartmentInfo& dep) {
+    auto worker = deps_.GetWorker();
+    worker->AddDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
+    worker->Commit();
+}
+
+void UseCasesImpl::DeleteDepartment(const ui::detail::DepartmentInfo& dep) {
+    auto worker = deps_.GetWorker();
+    worker->DeleteDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
+    worker->Commit();
+}
+
+void UseCasesImpl::UpdateDepartment(const ui::detail::DepartmentInfo& dep) {
+    auto worker = deps_.GetWorker();
+    worker->UpdateDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
+    worker->Commit();
+}
+
+std::vector<ui::detail::DepartmentInfo> UseCasesImpl::GetDepartments() const {
+    return deps_.Get();
+}
 
 void UseCasesImpl::AddJobTitle(const ui::detail::JobTitleInfo& job_title) {
     auto worker = job_titles_.GetWorker();
@@ -32,26 +55,29 @@ std::vector<ui::detail::JobTitleInfo> UseCasesImpl::GetJobTitles() const {
     return job_titles_.Get();
 }
 
-void UseCasesImpl::AddDepartment(const ui::detail::DepartmentInfo& dep) {
-    auto worker = deps_.GetWorker();
-    worker->AddDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
+void UseCasesImpl::AddStaffingTable(const ui::detail::StaffingTableInfo& staffing_table) {
+    auto worker = staffing_table_.GetWorker();
+    worker->AddStaffingTable({staffing_table.staffing_table_id, staffing_table.job_title_id,
+                              staffing_table.department_id, staffing_table.salary, staffing_table.time_job});
     worker->Commit();
 }
 
-void UseCasesImpl::DeleteDepartment(const ui::detail::DepartmentInfo& dep) {
-    auto worker = deps_.GetWorker();
-    worker->DeleteDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
+void UseCasesImpl::DeleteStaffingTable(const ui::detail::StaffingTableInfo& staffing_table) {
+    auto worker = staffing_table_.GetWorker();
+    worker->DeleteStaffingTable({staffing_table.staffing_table_id, staffing_table.job_title_id,
+                                 staffing_table.department_id, staffing_table.salary, staffing_table.time_job});
     worker->Commit();
 }
 
-void UseCasesImpl::UpdateDepartment(const ui::detail::DepartmentInfo& dep) {
-    auto worker = deps_.GetWorker();
-    worker->UpdateDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
+void UseCasesImpl::UpdateStaffingTable(const ui::detail::StaffingTableInfo& staffing_table) {
+    auto worker = job_titles_.GetWorker();
+    worker->UpdateStaffingTable({staffing_table.staffing_table_id, staffing_table.job_title_id,
+                                 staffing_table.department_id, staffing_table.salary, staffing_table.time_job});
     worker->Commit();
 }
 
-std::vector<ui::detail::DepartmentInfo> UseCasesImpl::GetDepartments() const {
-    return deps_.Get();
+std::vector<ui::detail::StaffingTableInfo> UseCasesImpl::GetStaffingTable() const {
+    return staffing_table_.Get();
 }
 
 void UseCasesImpl::AddTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) {

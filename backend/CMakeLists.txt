@@ -8,7 +8,7 @@ conan_basic_setup(TARGETS)
 
 add_executable(db src/app/use_cases.h src/app/use_cases_impl.cpp src/app/use_cases_impl.h src/connection_pool.h src/db.h src/db.cpp src/domain/department.h
                src/domain/department_fwd.h src/main.cpp src/postgres/postgres.h src/postgres/postgres.cpp src/ui/view.h src/domain/worker.h src/domain/job_title.h
-               src/domain/job_title_fwd.h src/domain/time_sheet.h src/domain/time_sheet_fwd.h)
+               src/domain/job_title_fwd.h src/domain/time_sheet.h src/domain/time_sheet_fwd.h src/domain/staffing_table.h src/domain/staffing_table_fwd.h)
 
 set(THREAD_PREFER_PTHREAD_FLAG_ON)
 find_package(Threads REQUIRED)

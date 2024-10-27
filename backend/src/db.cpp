@@ -12,17 +12,17 @@ Application::Application(const AppConfig& config)
     : db_(config.db_url) {}
 
 void Application::Run() {
-    ui::detail::TimeSheetInfo time_sheet{99, 100, 160, "апрель"};
-    use_cases_.AddTimeSheet(time_sheet);
-    for (auto& t_sheet : use_cases_.GetTimeSheet()) {
-        std::cout << t_sheet.time_sheet_id << ' ' << t_sheet.personnel_number << ' ' << t_sheet.time_worked << ' '
-                  << t_sheet.month << std::endl;
+    ui::detail::StaffingTableInfo staffing_table{101, 8, 11, 170000};
+    use_cases_.AddStaffingTable(staffing_table);
+    for (auto& st_table : use_cases_.GetStaffingTable()) {
+        std::cout << st_table.staffing_table_id << ' ' << st_table.job_title_id << ' ' << st_table.department_id
+                  << ' ' << st_table.time_job << ' ' << st_table.salary << std::endl;
     }
-    use_cases_.UpdateTimeSheet(time_sheet);
+    use_cases_.UpdateStaffingTable(staffing_table);
     std::cout << '\n';
-    for (auto& t_sheet : use_cases_.GetTimeSheet()) {
-        std::cout << t_sheet.time_sheet_id << ' ' << t_sheet.personnel_number << ' ' << t_sheet.time_worked << ' '
-                  << t_sheet.month << ' ' << std::endl;
+    for (auto& st_table : use_cases_.GetStaffingTable()) {
+        std::cout << st_table.staffing_table_id << ' ' << st_table.job_title_id << ' ' << st_table.department_id
+                  << ' ' << st_table.time_job << ' ' << st_table.salary << std::endl;
     }
 }
 
