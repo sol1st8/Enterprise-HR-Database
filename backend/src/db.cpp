@@ -12,15 +12,17 @@ Application::Application(const AppConfig& config)
     : db_(config.db_url) {}
 
 void Application::Run() {
-    ui::detail::JobTitleInfo job_title{16, "Слесарь"s};
-    use_cases_.AddJobTitle(job_title);
-    for (auto& j_title : use_cases_.GetJobTitles()) {
-        std::cout << j_title.id << ' ' << j_title.job_title << std::endl;
+    ui::detail::TimeSheetInfo time_sheet{101, 7, 11, 170000};
+    use_cases_.AddTimeSheet(time_sheet);
+    for (auto& t_sheet : use_cases_.GetTimeSheet()) {
+        std::cout << t_sheet.time_sheet_id << ' ' << t_sheet.job_title_id << ' ' << t_sheet.department_id << ' '
+                  << t_sheet.time_job << ' ' << t_sheet.salary << std::endl;
     }
-    use_cases_.DeleteJobTitle(job_title);
+    use_cases_.UpdateTimeSheet(time_sheet);
     std::cout << '\n';
-    for (auto& j_title : use_cases_.GetJobTitles()) {
-        std::cout << j_title.id << ' ' << j_title.job_title << std::endl;
+    for (auto& t_sheet : use_cases_.GetTimeSheet()) {
+        std::cout << t_sheet.time_sheet_id << ' ' << t_sheet.job_title_id << ' ' << t_sheet.department_id << ' '
+                  << t_sheet.time_job << ' ' << t_sheet.salary << std::endl;
     }
 }
 

@@ -18,13 +18,17 @@ class WorkerImpl : public domain::Worker {
   public:
     explicit WorkerImpl(pqxx::connection& conn);
 
+    void AddJobTitle(const domain::JobTitle& job_title) override;
+    void DeleteJobTitle(const domain::JobTitle& job_title) override;
+    void UpdateJobTitle(const domain::JobTitle& job_title) override;
+
     void AddDepartment(const domain::Department& dep) override;
     void DeleteDepartment(const domain::Department& dep) override;
     void UpdateDepartment(const domain::Department& dep) override;
 
-    void AddJobTitle(const domain::JobTitle& job_title) override;
-    void DeleteJobTitle(const domain::JobTitle& job_title) override;
-    void UpdateJobTitle(const domain::JobTitle& job_title) override;
+    void AddTimeSheet(const domain::TimeSheet& time_sheet) override;
+    void DeleteTimeSheet(const domain::TimeSheet& time_sheet) override;
+    void UpdateTimeSheet(const domain::TimeSheet& time_sheet) override;
 
     void Commit() override;
 
@@ -65,6 +69,21 @@ class JobTitleRepositoryImpl : public domain::JobTitleRepository {
     connection_pool::ConnectionPool& pool_;
 };
 
+class TimeSheetRepositoryImpl : public domain::TimeSheetRepository {
+  public:
+    explicit TimeSheetRepositoryImpl(connection_pool::ConnectionPool& pool) : pool_{pool} {}
+
+    std::vector<ui::detail::TimeSheetInfo> Get() const override;
+
+    std::shared_ptr<domain::Worker> GetWorker() const override {
+        auto conn = pool_.GetConnection();
+        return std::make_shared<WorkerImpl>(*conn);
+    }
+
+  private:
+    connection_pool::ConnectionPool& pool_;
+};
+
 class DataBase {
   public:
     explicit DataBase(const std::string& db_url);
@@ -77,10 +96,15 @@ class DataBase {
         return job_titles_;
     }
 
+    TimeSheetRepositoryImpl& GetTimeSheet() & {
+        return time_sheet_;
+    }
+
   private:
     connection_pool::ConnectionPool pool_;
     DepartmentRepositoryImpl deps_;
     JobTitleRepositoryImpl job_titles_;
+    TimeSheetRepositoryImpl time_sheet_;
 };
 
 }  // namespace postgres

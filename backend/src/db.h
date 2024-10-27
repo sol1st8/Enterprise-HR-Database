@@ -19,7 +19,7 @@ class Application {
 
   private:
     postgres::DataBase db_;
-    app::UseCasesImpl use_cases_{db_.GetDepartments(), db_.GetJobTitles()};
+    app::UseCasesImpl use_cases_{db_.GetDepartments(), db_.GetJobTitles(), db_.GetTimeSheet()};
 };
 
 } // namespace db

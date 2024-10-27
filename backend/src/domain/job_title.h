@@ -13,11 +13,11 @@ class Worker;
 
 class JobTitle {
   public:
-    JobTitle(int id, std::string job_title) : id_(id)
+    JobTitle(int job_title_id, std::string job_title) : job_title_id_(job_title_id)
                                             , job_title_(std::move(job_title)) {}
 
-    int GetId() const noexcept {
-        return id_;
+    int GetJobTitleId() const noexcept {
+        return job_title_id_;
     }
 
     const std::string& GetJobTitle() const noexcept {
@@ -25,7 +25,7 @@ class JobTitle {
     }
 
   private:
-    int id_;
+    int job_title_id_;
     std::string job_title_;
 };
 

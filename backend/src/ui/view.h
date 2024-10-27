@@ -14,7 +14,7 @@ namespace ui {
 namespace detail {
 
 struct JobTitleInfo {
-    int id;
+    int job_title_id;
     std::string job_title;
 
     bool operator==(const JobTitleInfo&) const = default;
@@ -34,12 +34,21 @@ struct BusinessTrip {
 };
 */
 struct DepartmentInfo {
-    int id;
+    int department_id;
     int manager_personal_num;
     std::string dep_name;
     int office_num;
 
     bool operator==(const DepartmentInfo&) const = default;
+};
+struct TimeSheetInfo {
+    int time_sheet_id;
+    int job_title_id;
+    int department_id;
+    int salary;
+    int time_job = 1;
+
+    bool operator==(const TimeSheetInfo&) const = default;
 };
 /*
 struct Vacation {

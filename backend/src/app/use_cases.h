@@ -15,7 +15,7 @@ struct DepartmentInfo;
 //struct Order;
 //struct СompositionBusinessTrip;
 //struct Employee;
-//struct Timesheet;
+struct TimeSheetInfo;
 //struct StaffingTable;
 
 } // namespace detail
@@ -41,6 +41,11 @@ class UseCases {
     virtual void DeleteDepartment(const ui::detail::DepartmentInfo& dep) = 0;
     virtual void UpdateDepartment(const ui::detail::DepartmentInfo& dep) = 0;
     virtual std::vector<ui::detail::DepartmentInfo> GetDepartments() const = 0;
+
+    virtual void AddTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) = 0;
+    virtual void DeleteTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) = 0;
+    virtual void UpdateTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) = 0;
+    virtual std::vector<ui::detail::TimeSheetInfo> GetTimeSheet() const = 0;
 
   protected:
     ~UseCases() = default;
