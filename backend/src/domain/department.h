@@ -13,8 +13,8 @@ class Worker;
 
 class Department {
   public:
-    Department(int department_id, int manager_personal_num, std::string dep_name, int office_num) : department_id_(department_id)
-                                                                                       , manager_personal_num_(manager_personal_num)
+    Department(int department_id, int manager_personnel_number, std::string dep_name, int office_num) : department_id_(department_id)
+                                                                                       , manager_personnel_number_(manager_personnel_number)
                                                                                        , dep_name_(std::move(dep_name))
                                                                                        , office_num_(office_num) {}
 
@@ -23,7 +23,7 @@ class Department {
     }
 
     int GetManagerPersonalNum() const noexcept {
-        return manager_personal_num_;
+        return manager_personnel_number_;
     }
 
     const std::string& GetDepName() const noexcept {
@@ -36,7 +36,7 @@ class Department {
 
   private:
     int department_id_;
-    int manager_personal_num_;
+    int manager_personnel_number_;
     std::string dep_name_;
     int office_num_;
 };

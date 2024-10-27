@@ -39,8 +39,8 @@ std::vector<ui::detail::DepartmentInfo> DepartmentRepositoryImpl::Get() const {
 
     std::vector<ui::detail::DepartmentInfo> result;
 
-    for (auto& [id, manager_personal_num, dep_name, office_num] : resp) {
-        ui::detail::DepartmentInfo department{id, manager_personal_num, dep_name, office_num};
+    for (auto& [id, manager_personal_number, dep_name, office_num] : resp) {
+        ui::detail::DepartmentInfo department{id, manager_personal_number, dep_name, office_num};
         result.push_back(department);
     }
 
@@ -51,14 +51,14 @@ std::vector<ui::detail::TimeSheetInfo> TimeSheetRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM ШтатноеРасписание;";
+    std::string query = "SELECT * FROM ТабельУчетаРабочегоВремени;";
 
-    auto resp = tr.query<int, int, int, int, int>(query);
+    auto resp = tr.query<int, int, int, std::string>(query);
 
     std::vector<ui::detail::TimeSheetInfo> result;
 
-    for (auto& [time_sheet_id, job_title_id, department_id, time_job, salary] : resp) {
-        ui::detail::TimeSheetInfo time_sheet{time_sheet_id, job_title_id, department_id, time_job, salary};
+    for (auto& [time_sheet_id, personnel_number, time_worked, month] : resp) {
+        ui::detail::TimeSheetInfo time_sheet{time_sheet_id, personnel_number, time_worked, month};
         result.push_back(time_sheet);
     }
 
@@ -125,15 +125,15 @@ void WorkerImpl::UpdateDepartment(const domain::Department& dep) {
 void WorkerImpl::AddTimeSheet(const domain::TimeSheet& time_sheet) {
     work_.exec_params(
         R"(
-    INSERT INTO ШтатноеРасписание (НомерЗаписи, КодДолжности, КодОтдела, КоличествоСтавок, Оклад) VALUES ($1, $2, $3, $4, $5);
+    INSERT INTO ТабельУчетаРабочегоВремени (НомерЗаписи, ТабельныйНомер, ОтработанноеВремя, Месяц) VALUES ($1, $2, $3, $4);
     )"_zv,
-        time_sheet.GetTimeSheetId(), time_sheet.GetJobTitleId(), time_sheet.GetDepartmentId(), time_sheet.GetTimeJob(), time_sheet.GetSalary());
+        time_sheet.GetTimeSheetId(), time_sheet.GetPersonnelNumber(), time_sheet.GetTimeWorked(), time_sheet.GetMonth());
 }
 
 void WorkerImpl::DeleteTimeSheet(const domain::TimeSheet& time_sheet) {
     work_.exec_params(
         R"(
-    DELETE FROM ШтатноеРасписание WHERE НомерЗаписи=$1;
+    DELETE FROM ТабельУчетаРабочегоВремени WHERE НомерЗаписи=$1;
     )"_zv,
         time_sheet.GetTimeSheetId());
 }
@@ -141,7 +141,7 @@ void WorkerImpl::DeleteTimeSheet(const domain::TimeSheet& time_sheet) {
 void WorkerImpl::UpdateTimeSheet(const domain::TimeSheet& time_sheet) {
     work_.exec_params(
         R"(
-    UPDATE ШтатноеРасписание SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
+    UPDATE ТабельУчетаРабочегоВремени SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
     )"_zv,
         time_sheet.GetTimeSheetId());
 }

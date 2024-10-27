@@ -35,7 +35,7 @@ struct BusinessTrip {
 */
 struct DepartmentInfo {
     int department_id;
-    int manager_personal_num;
+    int manager_personnel_number;
     std::string dep_name;
     int office_num;
 
@@ -43,10 +43,9 @@ struct DepartmentInfo {
 };
 struct TimeSheetInfo {
     int time_sheet_id;
-    int job_title_id;
-    int department_id;
-    int salary;
-    int time_job = 1;
+    int personnel_number;
+    int time_worked;
+    std::string month;
 
     bool operator==(const TimeSheetInfo&) const = default;
 };

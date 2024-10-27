@@ -13,38 +13,32 @@ class Worker;
 
 class TimeSheet {
   public:
-    TimeSheet(int time_sheet_id, int job_title_id, int department_id, int time_job, int salary) : time_sheet_id_(time_sheet_id)
-                                                                                                , job_title_id_(job_title_id)
-                                                                                                , department_id_(department_id)
-                                                                                                , salary_(salary)
-                                                                                                , time_job_(time_job) {}
+    TimeSheet(int time_sheet_id, int personnel_number, int time_worked, std::string month) : time_sheet_id_(time_sheet_id)
+                                                                                                , personnel_number_(personnel_number)
+                                                                                                , time_worked_(time_worked)
+                                                                                                , month_(month) {}
 
     int GetTimeSheetId() const noexcept {
         return time_sheet_id_;
     }
 
-    int GetJobTitleId() const noexcept {
-        return job_title_id_;
+    int GetPersonnelNumber() const noexcept {
+        return personnel_number_;
     }
 
-    int GetDepartmentId() const noexcept {
-        return department_id_;
+    int GetTimeWorked() const noexcept {
+        return time_worked_;
     }
 
-    int GetTimeJob() const noexcept {
-        return time_job_;
-    }
-
-    int GetSalary() const noexcept {
-        return salary_;
+    std::string GetMonth() const noexcept {
+        return month_;
     }
 
   private:
     int time_sheet_id_;
-    int job_title_id_;
-    int department_id_;
-    int salary_;
-    int time_job_ = 1;
+    int personnel_number_;
+    int time_worked_;
+    std::string month_;
 };
 
 class TimeSheetRepository {

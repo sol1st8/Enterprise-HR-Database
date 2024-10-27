@@ -34,19 +34,19 @@ std::vector<ui::detail::JobTitleInfo> UseCasesImpl::GetJobTitles() const {
 
 void UseCasesImpl::AddDepartment(const ui::detail::DepartmentInfo& dep) {
     auto worker = deps_.GetWorker();
-    worker->AddDepartment({dep.department_id, dep.manager_personal_num, dep.dep_name, dep.office_num});
+    worker->AddDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
     worker->Commit();
 }
 
 void UseCasesImpl::DeleteDepartment(const ui::detail::DepartmentInfo& dep) {
     auto worker = deps_.GetWorker();
-    worker->DeleteDepartment({dep.department_id, dep.manager_personal_num, dep.dep_name, dep.office_num});
+    worker->DeleteDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
     worker->Commit();
 }
 
 void UseCasesImpl::UpdateDepartment(const ui::detail::DepartmentInfo& dep) {
     auto worker = deps_.GetWorker();
-    worker->UpdateDepartment({dep.department_id, dep.manager_personal_num, dep.dep_name, dep.office_num});
+    worker->UpdateDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
     worker->Commit();
 }
 
@@ -56,19 +56,19 @@ std::vector<ui::detail::DepartmentInfo> UseCasesImpl::GetDepartments() const {
 
 void UseCasesImpl::AddTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) {
     auto worker = time_sheet_.GetWorker();
-    worker->AddTimeSheet({time_sheet.time_sheet_id, time_sheet.job_title_id, time_sheet.department_id, time_sheet.time_job, time_sheet.salary});
+    worker->AddTimeSheet({time_sheet.time_sheet_id, time_sheet.personnel_number, time_sheet.time_worked, time_sheet.month});
     worker->Commit();
 }
 
 void UseCasesImpl::DeleteTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) {
     auto worker = time_sheet_.GetWorker();
-    worker->DeleteTimeSheet({time_sheet.time_sheet_id, time_sheet.job_title_id, time_sheet.department_id, time_sheet.time_job, time_sheet.salary});
+    worker->DeleteTimeSheet({time_sheet.time_sheet_id, time_sheet.personnel_number, time_sheet.time_worked, time_sheet.month});
     worker->Commit();
 }
 
 void UseCasesImpl::UpdateTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) {
     auto worker = time_sheet_.GetWorker();
-    worker->UpdateTimeSheet({time_sheet.time_sheet_id, time_sheet.job_title_id, time_sheet.department_id, time_sheet.time_job, time_sheet.salary});
+    worker->UpdateTimeSheet({time_sheet.time_sheet_id, time_sheet.personnel_number, time_sheet.time_worked, time_sheet.month});
     worker->Commit();
 }
 

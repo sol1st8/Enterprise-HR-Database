@@ -1,3 +1,0 @@
-/home/enxsz/PetProjects/Enterprise-HR-Database/backend/build/CMakeFiles/db.dir
-/home/enxsz/PetProjects/Enterprise-HR-Database/backend/build/CMakeFiles/edit_cache.dir
-/home/enxsz/PetProjects/Enterprise-HR-Database/backend/build/CMakeFiles/rebuild_cache.dir
