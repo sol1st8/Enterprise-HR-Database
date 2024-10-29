@@ -12,17 +12,21 @@ Application::Application(const AppConfig& config)
     : db_(config.db_url) {}
 
 void Application::Run() {
-    ui::detail::StaffingTableInfo staffing_table{101, 8, 11, 170000};
-    use_cases_.AddStaffingTable(staffing_table);
-    for (auto& st_table : use_cases_.GetStaffingTable()) {
-        std::cout << st_table.staffing_table_id << ' ' << st_table.job_title_id << ' ' << st_table.department_id
-                  << ' ' << st_table.time_job << ' ' << st_table.salary << std::endl;
+    ui::detail::EmployeeInfo employee{101, "Егоров Вадим Николаевич", 5, std::nullopt, "89018088635", "г. Москва ул.Ташкентская", "высшее", "egorov59r@gmail.com"};
+    use_cases_.AddEmployee(employee);
+    for (auto& emp : use_cases_.GetEmployees()) {
+        std::cout << emp.personnel_number << ' ' << emp.full_name << ' ' << emp.gender << ' '
+                  << emp.job_title_id << ' ' << (emp.stage.has_value() ? std::to_string(*emp.stage) : "NULL") << ' '
+                  << emp.number << ' ' << emp.registration << ' ' << emp.education << ' ' << emp.date << ' ' << emp.mail << ' '
+                  << emp.marital_status << std::endl;
     }
-    use_cases_.UpdateStaffingTable(staffing_table);
-    std::cout << '\n';
-    for (auto& st_table : use_cases_.GetStaffingTable()) {
-        std::cout << st_table.staffing_table_id << ' ' << st_table.job_title_id << ' ' << st_table.department_id
-                  << ' ' << st_table.time_job << ' ' << st_table.salary << std::endl;
+    use_cases_.DeleteEmployee(employee);
+    std::cout << std::endl;
+    for (auto& emp : use_cases_.GetEmployees()) {
+        std::cout << emp.personnel_number << ' ' << emp.full_name << ' ' << emp.gender << ' '
+                  << emp.job_title_id << ' ' << (emp.stage.has_value() ? std::to_string(*emp.stage) : "NULL") << ' '
+                  << emp.number << ' ' << emp.registration << ' ' << emp.education << ' ' << emp.date << ' ' << emp.mail << ' '
+                  << emp.marital_status << std::endl;
     }
 }
 
