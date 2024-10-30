@@ -1,19 +1,17 @@
 #pragma once
 
 #include "http_server.h"
+#include "resp_maker.h"
 
 #include <boost/beast.hpp>
-#include <boost/json.hpp>
 #include <filesystem>
+#include <utility>
 
 namespace http_handler {
 namespace beast = boost::beast;
 namespace http = beast::http;
-namespace json = boost::json;
-namespace sys = boost::system;
 using HttpResponse = http::response<http::string_body>;
 using namespace std::literals;
-namespace net = boost::asio;
 
 class RequestHandler {
   public:
@@ -30,29 +28,75 @@ class RequestHandler {
 
     template <typename Body, typename Allocator, typename Send>
     void HandleStaticDataResponse(http::request<Body, http::basic_fields<Allocator>>&& req,
-                                  std::string_view target, Send&& send);
+                               std::string_view target, Send&& send);
 
     template <typename Body, typename Allocator, typename Send>
-    void TryToSendFile(http::request<Body, http::basic_fields<Allocator>>&& req,
+    void TryToSendFile(http::request<Body, http::basic_fields<Allocator>>& req,
                        const std::filesystem::path& file, Send&& send);
 };
 
+
 template <typename Body, typename Allocator, typename Send>
 void RequestHandler::operator()(http::request<Body, http::basic_fields<Allocator>>&& req, Send&& send) {
-    std::string_view target = req.target();
+                                std::string_view target = req.target();
 
     if (target.starts_with("/api"s)) {
-        // ...
+        return;
     }
     else {
-        HandleStaticDataResonse(std::forward<decltype(req)>(req), target, std::forward<Send>(send));
+        HandleStaticDataResponse(std::forward<decltype(req)>(req), target, std::forward<Send>(send));
     }
 }
 
 template <typename Body, typename Allocator, typename Send>
 void RequestHandler::HandleStaticDataResponse(http::request<Body, http::basic_fields<Allocator>>&& req,
                                               std::string_view target, Send&& send) {
-    // ...
+    using namespace resp_maker::txt_resp;
+    namespace fs = std::filesystem;
+
+    fs::path file = fs::weakly_canonical(static_data_path_ / target.substr(1));
+
+    if (!file.string().starts_with(static_data_path_.string())) {
+        return send(MakeBadRequestResponse(req, "Access denied"));
+    }
+
+    if (fs::exists(file)) {
+        if (fs::is_directory(file)) {
+            if (fs::exists(file / "index.html")) {
+                file /= "index.html";
+                TryToSendFile(req, file, send);
+            }
+            else if (fs::exists(file / "index.htm")){
+                file /= "index.htm";
+                TryToSendFile(req, file, send);
+            }
+            else {
+                return send(MakeNotFoundResponse(req, "No index.html in directory"));
+            }
+        }
+        else {
+            TryToSendFile(req, file, send);
+        }
+    }
+    else {
+        return send(MakeNotFoundResponse(req, "No such file or directory"));
+    }
 }
 
-} // namespace http_handler
+template <typename Body, typename Allocator, typename Send>
+void RequestHandler::TryToSendFile(http::request<Body, http::basic_fields<Allocator>>& req,
+                                   const std::filesystem::path& file, Send&& send) {
+    using namespace resp_maker;
+
+    try {
+        return send(file_resp::MakeFileResponse(req, file));
+    }
+    catch (const std::runtime_error& e) {
+        return send(txt_resp::MakeServerErrorResponse(req, e.what()));
+    }
+    catch (...) {
+        return send(txt_resp::MakeServerErrorResponse(req, "Unknown error"));
+    }
+}
+
+}  // namespace http_handler

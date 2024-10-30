@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
 conan_basic_setup(TARGETS)
 
-add_executable(http_server src/main.cpp src/http_server.h src/http_server.cpp)
+add_executable(http_server src/main.cpp src/http_server.h src/http_server.cpp src/body_types.cpp src/body_types.h src/boost_json.cpp src/request_handler.h
+  src/resp_maker.h src/sdk.h)
 
 set(THREAD_PREFER_PTHREAD_FLAG_ON)
 find_package(Threads REQUIRED)
