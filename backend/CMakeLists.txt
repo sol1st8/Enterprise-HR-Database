@@ -9,6 +9,12 @@ conan_basic_setup(TARGETS)
 add_executable(http_server src/main.cpp src/http_server.h src/http_server.cpp src/body_types.cpp src/body_types.h src/boost_json.cpp src/request_handler.h
   src/resp_maker.h src/sdk.h)
 
+#add_executable(db src/app/use_cases.h src/app/use_cases_impl.cpp src/app/use_cases_impl.h src/connection_pool.h src/db.h src/db.cpp src/domain/department.h
+#               src/domain/department_fwd.h src/main.cpp src/postgres/postgres.h src/postgres/postgres.cpp src/ui/view.h src/domain/worker.h src/domain/job_title.h
+#               src/domain/job_title_fwd.h src/domain/time_sheet.h src/domain/time_sheet_fwd.h src/domain/staffing_table.h src/domain/staffing_table_fwd.h
+#               src/domain/order.h src/domain/order_fwd.h src/domain/business_trip.h src/domain/business_trip_fwd.h src/domain/composition_business_trip.h
+#               src/domain/composition_business_trip_fwd.h src/domain/vacation.h src/domain/vacation_fwd.h src/domain/employee.h src/domain/employee_fwd.h)
+
 set(THREAD_PREFER_PTHREAD_FLAG_ON)
 find_package(Threads REQUIRED)
 
@@ -18,7 +24,7 @@ else()
   set(SYSTEM_LIBS)
 endif()
 
-target_include_directories(http_server PRIVATE CONAN_PKG::boost)
-target_link_libraries(http_server PRIVATE Threads::Threads CONAN_PKG::boost)
+target_include_directories(http_server PRIVATE CONAN_PKG::boost CONAN_PKG:libpqxx)
+target_link_libraries(http_server PRIVATE Threads::Threads CONAN_PKG::boost CONAN_PKG::libpqxx)
 
 target_link_libraries(http_server ${SYSTEM_LIBS})
