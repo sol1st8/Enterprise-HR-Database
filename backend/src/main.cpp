@@ -1,6 +1,6 @@
-#include "http_server.h"
+#include "application.h"
+#include "http_server/http_server.h"
 #include "request_handler.h"
-#include "sdk.h"
 
 #include <boost/asio/signal_set.hpp>
 #include <filesystem>
@@ -31,7 +31,7 @@ void RunWorkers(unsigned n, const Fn& fn) {
 
 int main(int argc, const char* argv[]) {
     if (argc != 2) {
-        std::cerr << "Usage: http_server <static-data-path>"sv
+        std::cerr << "Usage: run_server <static-data-path>"sv
                   << std::endl;
         return EXIT_FAILURE;
     }
@@ -69,40 +69,3 @@ int main(int argc, const char* argv[]) {
         return EXIT_FAILURE;
     }
 }
-
-/*#include "db.h"
-
-#include <cstdlib>
-#include <iostream>
-#include <stdexcept>
-
-using namespace std::literals;
-
-namespace {
-
-constexpr const char DB_URL_ENV_NAME[]{"DB_URL"};
-
-db::AppConfig GetConfigFromEnv() {
-    db::AppConfig config;
-    if (const auto* url = std::getenv(DB_URL_ENV_NAME)) {
-        config.db_url = url;
-    }
-    else {
-        throw std::runtime_error(DB_URL_ENV_NAME + " environment variable not found"s);
-    }
-    return config;
-}
-
-}  // namespace
-
-int main([[maybe_unused]] int argc, [[maybe_unused]] const char* argv[]) {
-    try {
-        db::Application app{GetConfigFromEnv()};
-        app.Run();
-    }
-    catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-}
-*/

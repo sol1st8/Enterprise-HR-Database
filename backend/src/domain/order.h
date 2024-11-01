@@ -59,6 +59,8 @@ class OrderRepository {
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 
+    virtual int GetCount() const = 0;
+
   protected:
     ~OrderRepository() = default;
 };

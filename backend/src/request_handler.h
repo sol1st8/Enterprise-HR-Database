@@ -1,6 +1,7 @@
 #pragma once
 
-#include "http_server.h"
+#include "api/api_handler.h"
+#include "http_server/http_server.h"
 #include "resp_maker.h"
 
 #include <boost/beast.hpp>
@@ -41,7 +42,7 @@ void RequestHandler::operator()(http::request<Body, http::basic_fields<Allocator
                                 std::string_view target = req.target();
 
     if (target.starts_with("/api"s)) {
-        return;
+        api_handler::HandleApiRequest(std::forward<decltype(req)>(req), std::forward<Send>(send));
     }
     else {
         HandleStaticDataResponse(std::forward<decltype(req)>(req), target, std::forward<Send>(send));
@@ -57,21 +58,21 @@ void RequestHandler::HandleStaticDataResponse(http::request<Body, http::basic_fi
     fs::path file = fs::weakly_canonical(static_data_path_ / target.substr(1));
 
     if (!file.string().starts_with(static_data_path_.string())) {
-        return send(MakeBadRequestResponse(req, "Access denied"));
+        return send(MakeBadRequestResponse(req, "Access denied"s));
     }
 
     if (fs::exists(file)) {
         if (fs::is_directory(file)) {
-            if (fs::exists(file / "index.html")) {
-                file /= "index.html";
+            if (fs::exists(file / "index.html"s)) {
+                file /= "index.html"s;
                 TryToSendFile(req, file, send);
             }
-            else if (fs::exists(file / "index.htm")){
-                file /= "index.htm";
+            else if (fs::exists(file / "index.htm"s)){
+                file /= "index.htm"s;
                 TryToSendFile(req, file, send);
             }
             else {
-                return send(MakeNotFoundResponse(req, "No index.html in directory"));
+                return send(MakeNotFoundResponse(req, "No index.html in directory"s));
             }
         }
         else {
@@ -79,7 +80,7 @@ void RequestHandler::HandleStaticDataResponse(http::request<Body, http::basic_fi
         }
     }
     else {
-        return send(MakeNotFoundResponse(req, "No such file or directory"));
+        return send(MakeNotFoundResponse(req, "No such file or directory"s));
     }
 }
 
@@ -95,7 +96,7 @@ void RequestHandler::TryToSendFile(http::request<Body, http::basic_fields<Alloca
         return send(txt_resp::MakeServerErrorResponse(req, e.what()));
     }
     catch (...) {
-        return send(txt_resp::MakeServerErrorResponse(req, "Unknown error"));
+        return send(txt_resp::MakeServerErrorResponse(req, "Unknown error"s));
     }
 }
 

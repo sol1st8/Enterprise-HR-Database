@@ -11,12 +11,12 @@ class Worker;
 class Employee {
   public:
     Employee(int personnel_number, std::string full_name, int job_title_id,
-             std::optional<int> stage, std::string number, std::string registration,
+             std::optional<int> experience, std::string number, std::string registration,
              std::string education, std::string mail, std::string gender,
              std::string marital_status, std::string date = "") : personnel_number_(personnel_number)
                                                                 , full_name_(std::move(full_name))
                                                                 , job_title_id_(job_title_id)
-                                                                , stage_(stage)
+                                                                , experience_(experience)
                                                                 , number_(std::move(number))
                                                                 , registration_(std::move(registration))
                                                                 , education_(std::move(education))
@@ -41,8 +41,8 @@ class Employee {
         return job_title_id_;
     }
 
-    std::optional<int> GetStage() const noexcept {
-        return stage_;
+    std::optional<int> GetExperience() const noexcept {
+        return experience_;
     }
 
     const std::string& GetNumber() const noexcept {
@@ -77,7 +77,7 @@ class Employee {
     int personnel_number_;
     std::string full_name_;
     int job_title_id_;
-    std::optional<int> stage_;
+    std::optional<int> experience_;
     std::string number_;
     std::string registration_;
     std::string education_;
@@ -101,6 +101,8 @@ class EmployeeRepository {
     virtual std::vector<ui::detail::EmployeeInfo> Get() const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
+
+    virtual int GetCount() const = 0;
 
   protected:
     ~EmployeeRepository() = default;

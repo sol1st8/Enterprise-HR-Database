@@ -1,6 +1,6 @@
 #pragma once
 
-#include "body_types.h"
+#include "body_types/body_types.h"
 
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
@@ -115,6 +115,7 @@ MakeTextResponse(const ResponseInfo& resp_info) {
 } // namespace detail
 
 namespace file_resp {
+using namespace std::literals;
 
 template <typename Body, typename Allocator>
 http::response<http::file_body, http::basic_fields<Allocator>>
@@ -125,7 +126,7 @@ MakeFileResponse(const http::request<Body, http::basic_fields<Allocator>>& req,
     http::file_body::value_type data;
 
     if (sys::error_code ec; data.open(file.string().data(), beast::file_mode::read, ec), ec) {
-        throw std::runtime_error("Failed to open file");
+        throw std::runtime_error("Failed to open file"s);
     }
 
     std::string_view content_type = body_type::GetTypeByExtention(file.extension().string());

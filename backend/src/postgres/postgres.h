@@ -72,6 +72,8 @@ class BusinessTripRepositoryImpl : public domain::BusinessTripRepository {
         return std::make_shared<WorkerImpl>(*conn);
     }
 
+    int GetCount() const override;
+
   private:
     connection_pool::ConnectionPool& pool_;
 };
@@ -102,6 +104,8 @@ class DepartmentRepositoryImpl : public domain::DepartmentRepository {
         return std::make_shared<WorkerImpl>(*conn);
     }
 
+    int GetCount() const override;
+
   private:
     connection_pool::ConnectionPool& pool_;
 };
@@ -116,6 +120,8 @@ class EmployeeRepositoryImpl : public domain::EmployeeRepository {
         auto conn = pool_.GetConnection();
         return std::make_shared<WorkerImpl>(*conn);
     }
+
+    int GetCount() const override;
 
   private:
     connection_pool::ConnectionPool& pool_;
@@ -132,6 +138,8 @@ class JobTitleRepositoryImpl : public domain::JobTitleRepository {
         return std::make_shared<WorkerImpl>(*conn);
     }
 
+    int GetCount() const override;
+
   private:
     connection_pool::ConnectionPool& pool_;
 };
@@ -146,6 +154,8 @@ class OrderRepositoryImpl : public domain::OrderRepository {
         auto conn = pool_.GetConnection();
         return std::make_shared<WorkerImpl>(*conn);
     }
+
+    int GetCount() const override;
 
   private:
     connection_pool::ConnectionPool& pool_;
@@ -162,6 +172,8 @@ class StaffingTableRepositoryImpl : public domain::StaffingTableRepository {
         return std::make_shared<WorkerImpl>(*conn);
     }
 
+    int GetCount() const override;
+
   private:
     connection_pool::ConnectionPool& pool_;
 };
@@ -177,6 +189,8 @@ class TimeSheetRepositoryImpl : public domain::TimeSheetRepository {
         return std::make_shared<WorkerImpl>(*conn);
     }
 
+    int GetCount() const override;
+
   private:
     connection_pool::ConnectionPool& pool_;
 };
@@ -191,6 +205,8 @@ class VacationRepositoryImpl : public domain::VacationRepository {
         auto conn = pool_.GetConnection();
         return std::make_shared<WorkerImpl>(*conn);
     }
+
+    int GetCount() const override;
 
   private:
     connection_pool::ConnectionPool& pool_;

@@ -1,20 +1,15 @@
 #pragma once
 
-#include "boost/system/detail/error_code.hpp"
 #define BOOST_BEAST_USE_STD_STRING_VIEW
 
-#include "sdk.h"
+#include "../sdk.h"
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
 #include <boost/beast/http.hpp>
-
 #include <memory>
-#include <string>
-#include <string_view>
-#include <utility>
 
 namespace net = boost::asio;
 using tcp = net::ip::tcp;
@@ -24,7 +19,7 @@ namespace http = beast::http;
 namespace url_decode {
 
 int IntFromHex(char hex);
-int InrFrom2Hex(char first, char second);
+int IntFrom2Hex(char first, char second);
 std::string DecodeURL(std::string_view url);
 
 } // namespace url_decode

@@ -12,7 +12,7 @@ std::vector<ui::detail::BusinessTripInfo> BusinessTripRepositoryImpl::Get() cons
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Командировка;";
+    std::string query = "SELECT * FROM Командировка;"s;
 
     auto resp = tr.query<int, std::string, std::string, std::string,
                          std::string, std::string, int, std::string>(query);
@@ -27,11 +27,22 @@ std::vector<ui::detail::BusinessTripInfo> BusinessTripRepositoryImpl::Get() cons
     return result;
 }
 
+int BusinessTripRepositoryImpl::GetCount() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT COUNT(*) FROM Командировка;"s;
+
+    auto count = tr.query_value<int>(query);
+
+    return count;
+}
+
 std::vector<ui::detail::CompositionBusinessTripInfo> CompositionBusinessTripRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM СоставКомандировки;";
+    std::string query = "SELECT * FROM СоставКомандировки;"s;
 
     auto resp = tr.query<int, int>(query);
 
@@ -49,7 +60,7 @@ std::vector<ui::detail::DepartmentInfo> DepartmentRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Отдел;";
+    std::string query = "SELECT * FROM Отдел;"s;
 
     auto resp = tr.query<int, int, std::string, int>(query);
 
@@ -63,21 +74,32 @@ std::vector<ui::detail::DepartmentInfo> DepartmentRepositoryImpl::Get() const {
     return result;
 }
 
+int DepartmentRepositoryImpl::GetCount() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT COUNT(*) FROM Отдел;"s;
+
+    auto count = tr.query_value<int>(query);
+
+    return count;
+}
+
 std::vector<ui::detail::EmployeeInfo> EmployeeRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Сотрудник;";
+    std::string query = "SELECT * FROM Сотрудник;"s;
 
     auto resp = tr.query<int, std::string, std::string, int, std::optional<int>, std::string,
                          std::string, std::string, std::string, std::string, std::string>(query);
 
     std::vector<ui::detail::EmployeeInfo> result;
 
-    for (auto& [personnel_number, full_name, gender, job_title_id, stage, number,
+    for (auto& [personnel_number, full_name, gender, job_title_id, experience, number,
                 registration, education, date, mail, merial_status] : resp) {
         ui::detail::EmployeeInfo employee{personnel_number, full_name, job_title_id,
-                                          stage, number, registration, education, mail,
+                                          experience, number, registration, education, mail,
                                           gender, merial_status, date};
         result.push_back(employee);
     }
@@ -85,11 +107,22 @@ std::vector<ui::detail::EmployeeInfo> EmployeeRepositoryImpl::Get() const {
     return result;
 }
 
+int EmployeeRepositoryImpl::GetCount() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT COUNT(*) FROM Сотрудник;"s;
+
+    auto count = tr.query_value<int>(query);
+
+    return count;
+}
+
 std::vector<ui::detail::JobTitleInfo> JobTitleRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Должность;";
+    std::string query = "SELECT * FROM Должность;"s;
 
     auto resp = tr.query<int, std::string>(query);
 
@@ -103,11 +136,22 @@ std::vector<ui::detail::JobTitleInfo> JobTitleRepositoryImpl::Get() const {
     return result;
 }
 
+int JobTitleRepositoryImpl::GetCount() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT COUNT(*) FROM Должность;"s;
+
+    auto count = tr.query_value<int>(query);
+
+    return count;
+}
+
 std::vector<ui::detail::OrderInfo> OrderRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Приказ;";
+    std::string query = "SELECT * FROM Приказ;"s;
 
     auto resp = tr.query<int, int, std::string, std::string>(query);
 
@@ -121,11 +165,22 @@ std::vector<ui::detail::OrderInfo> OrderRepositoryImpl::Get() const {
     return result;
 }
 
+int OrderRepositoryImpl::GetCount() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT COUNT(*) FROM Приказ;"s;
+
+    auto count = tr.query_value<int>(query);
+
+    return count;
+}
+
 std::vector<ui::detail::StaffingTableInfo> StaffingTableRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM ШтатноеРасписание;";
+    std::string query = "SELECT * FROM ШтатноеРасписание;"s;
 
     auto resp = tr.query<int, int, int, int, int>(query);
 
@@ -139,11 +194,22 @@ std::vector<ui::detail::StaffingTableInfo> StaffingTableRepositoryImpl::Get() co
     return result;
 }
 
+int StaffingTableRepositoryImpl::GetCount() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT COUNT(*) FROM ШтатноеРасписание;"s;
+
+    auto count = tr.query_value<int>(query);
+
+    return count;
+}
+
 std::vector<ui::detail::TimeSheetInfo> TimeSheetRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM ТабельУчетаРабочегоВремени;";
+    std::string query = "SELECT * FROM ТабельУчетаРабочегоВремени;"s;
 
     auto resp = tr.query<int, int, int, std::string>(query);
 
@@ -157,11 +223,22 @@ std::vector<ui::detail::TimeSheetInfo> TimeSheetRepositoryImpl::Get() const {
     return result;
 }
 
+int TimeSheetRepositoryImpl::GetCount() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT COUNT(*) FROM ТабельУчетаРабочегоВремени;"s;
+
+    auto count = tr.query_value<int>(query);
+
+    return count;
+}
+
 std::vector<ui::detail::VacationInfo> VacationRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Отпуск;";
+    std::string query = "SELECT * FROM Отпуск;"s;
 
     auto resp = tr.query<int, int, std::string, std::string, std::string, int, std::string>(query);
 
@@ -174,6 +251,17 @@ std::vector<ui::detail::VacationInfo> VacationRepositoryImpl::Get() const {
     }
 
     return result;
+}
+
+int VacationRepositoryImpl::GetCount() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT COUNT(*) FROM Отпуск;"s;
+
+    auto count = tr.query_value<int>(query);
+
+    return count;
 }
 
 DataBase::DataBase(const std::string& db_url)
@@ -268,7 +356,7 @@ void WorkerImpl::UpdateDepartment(const domain::Department& dep) {
 }
 
 void WorkerImpl::AddEmployee(const domain::Employee& employee) {
-    if (employee.GetStage().has_value()) {
+    if (employee.GetExperience().has_value()) {
         work_.exec_params(
             R"(
         INSERT INTO Сотрудник (ТабельныйНомер, ФИО, Пол, КодДолжности, Стаж,
@@ -277,7 +365,7 @@ void WorkerImpl::AddEmployee(const domain::Employee& employee) {
                                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
         )"_zv,
             employee.GetPersonnelNumber(), employee.GetFullName(), employee.GetGender(),
-            employee.GetJobTitleId(), *employee.GetStage(), employee.GetNumber(), employee.GetRegistration(),
+            employee.GetJobTitleId(), *employee.GetExperience(), employee.GetNumber(), employee.GetRegistration(),
             employee.GetEducation(), employee.GetDate(), employee.GetMail(), employee.GetMerialStatus());
     }
     else {

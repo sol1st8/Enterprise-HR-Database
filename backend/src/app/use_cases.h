@@ -71,6 +71,15 @@ class UseCases {
     virtual void UpdateVacation(const ui::detail::VacationInfo& vacation) = 0;
     virtual std::vector<ui::detail::VacationInfo> GetVacations() const = 0;
 
+    virtual int GetCountBusinessTrips() const = 0;
+    virtual int GetCountDepartments() const = 0;
+    virtual int GetCountEmployees() const = 0;
+    virtual int GetCountJobTitles() const = 0;
+    virtual int GetCountOrders() const = 0;
+    virtual int GetCountStaffingTable() const = 0;
+    virtual int GetCountTimeSheet() const = 0;
+    virtual int GetCountVacations() const = 0;
+
   protected:
     ~UseCases() = default;
 };

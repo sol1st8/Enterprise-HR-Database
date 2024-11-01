@@ -13,7 +13,7 @@ class Worker;
 class JobTitle {
   public:
     JobTitle(int job_title_id, std::string job_title) : job_title_id_(job_title_id)
-                                            , job_title_(std::move(job_title)) {}
+                                                      , job_title_(std::move(job_title)) {}
 
     int GetJobTitleId() const noexcept {
         return job_title_id_;
@@ -33,6 +33,8 @@ class JobTitleRepository {
     virtual std::vector<ui::detail::JobTitleInfo> Get() const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
+
+    virtual int GetCount() const = 0;
 
   protected:
     ~JobTitleRepository() = default;

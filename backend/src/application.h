@@ -15,7 +15,7 @@ class Application {
   public:
     explicit Application(const AppConfig& config);
 
-    void Run();
+    app::UseCasesImpl GetUseCases() const;
 
   private:
     postgres::DataBase db_;

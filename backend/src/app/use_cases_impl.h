@@ -70,6 +70,15 @@ class UseCasesImpl : public UseCases {
     void UpdateVacation(const ui::detail::VacationInfo& vacation) override;
     std::vector<ui::detail::VacationInfo> GetVacations() const override;
 
+    int GetCountBusinessTrips() const override;
+    int GetCountDepartments() const override;
+    int GetCountEmployees() const override;
+    int GetCountJobTitles() const override;
+    int GetCountOrders() const override;
+    int GetCountStaffingTable() const override;
+    int GetCountTimeSheet() const override;
+    int GetCountVacations() const override;
+
   private:
     domain::BusinessTripRepository& trips_;
     domain::CompositionBusinessTripRepository& composition_trips_;

@@ -72,6 +72,8 @@ class BusinessTripRepository {
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 
+    virtual int GetCount() const = 0;
+
   protected:
     ~BusinessTripRepository() = default;
 };

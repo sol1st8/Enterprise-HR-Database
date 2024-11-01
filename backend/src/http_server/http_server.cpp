@@ -1,7 +1,6 @@
 #include "http_server.h"
 
 #include <iostream>
-#include <stdexcept>
 
 namespace http_server {
 
@@ -9,8 +8,8 @@ void ReportError(beast::error_code ec, std::string_view what) {
     std::cerr << what << ": "sv << ec.message() << std::endl;
 }
 
-SessionBase::SessionBase(tcp::socket&& socket)
-    : stream_(std::move(socket)), remote_endpoint_(socket.remote_endpoint()) {}
+SessionBase::SessionBase(tcp::socket&& socket) : stream_(std::move(socket)),
+                                                 remote_endpoint_(socket.remote_endpoint()) {}
 
 void SessionBase::Run() {
     net::dispatch(stream_.get_executor(), beast::bind_front_handler(&SessionBase::Read, GetSharedThis()));
@@ -32,7 +31,7 @@ void SessionBase::OnRead(beast::error_code ec, [[maybe_unused]] size_t bytes_rea
     HandleRequest(std::move(request_));
 }
 
-void SessionBase::OnWrite(bool close, beast::error_code ec, [[maybe_unused]] size_t bytes_writter) {
+void SessionBase::OnWrite(bool close, beast::error_code ec, [[maybe_unused]] size_t bytes_written) {
     if (close) {
         return Close();
     }
@@ -43,7 +42,7 @@ void SessionBase::OnWrite(bool close, beast::error_code ec, [[maybe_unused]] siz
 }
 
 void SessionBase::Close() {
-    stream_.socket(). shutdown(tcp::socket::shutdown_send);
+    stream_.socket().shutdown(tcp::socket::shutdown_send);
 }
 
 } // namespace http_server
@@ -74,8 +73,8 @@ std::string DecodeURL(std::string_view url) {
     result.reserve(url.size());
 
     while (i < size) {
-        char curr = url.at(i);
-        if (curr == '%') {
+        char cur = url.at(i);
+        if (cur == '%') {
             if (i > size - 3) {
                 throw std::runtime_error("Incorrect url");
             }
@@ -86,11 +85,11 @@ std::string DecodeURL(std::string_view url) {
             result.push_back(static_cast<char>(hex));
             i += 2;
         }
-        else if (curr == '+') {
+        else if (cur == '+') {
             result.push_back(' ');
         }
         else {
-            result.push_back(curr);
+            result.push_back(cur);
         }
         ++i;
     }
