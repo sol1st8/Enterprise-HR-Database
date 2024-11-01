@@ -45,7 +45,7 @@ class SessionBase {
 
     template <typename Body, typename Fields>
     void Write(http::response<Body, Fields>&& response) {
-        auto safe_response = make_shared<http::response<Body, Fields>>(std::move(response));
+        auto safe_response = std::make_shared<http::response<Body, Fields>>(std::move(response));
 
         auto self = GetSharedThis();
         http::async_write(stream_, *safe_response, [safe_response, self](beast::error_code ec, size_t bytes_written) {
@@ -140,7 +140,7 @@ template <typename RequestHandler>
 void ServeHttp(net::io_context& ioc, const tcp::endpoint& endpoint, RequestHandler&& handler) {
     using MyListener = Listener<std::decay_t<RequestHandler>>;
 
-    make_shared<MyListener>(ioc, endpoint, std::forward<RequestHandler>(handler))->Run();
+    std::make_shared<MyListener>(ioc, endpoint, std::forward<RequestHandler>(handler))->Run();
 }
 
 } // namespace http_server
