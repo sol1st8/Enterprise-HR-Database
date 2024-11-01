@@ -29,8 +29,6 @@ struct BusinessTripInfo {
     std::string target;
     std::string country = "Россия";
 
-    bool operator==(const BusinessTripInfo&) const = default;
-
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::BusinessTripInfo& trip) {
         jv = {
@@ -66,8 +64,6 @@ struct CompositionBusinessTripInfo {
     int personnel_number;
     int trip_id;
 
-    bool operator==(const CompositionBusinessTripInfo&) const = default;
-
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::CompositionBusinessTripInfo& trip) {
         jv = {
@@ -92,8 +88,6 @@ struct DepartmentInfo {
     int manager_personnel_number;
     std::string dep_name;
     int office_num;
-
-    bool operator==(const DepartmentInfo&) const = default;
 
     friend void tag_invoke (json::value_from_tag, json::value& jv,
                             const ui::detail::DepartmentInfo& department) {
@@ -131,8 +125,6 @@ struct EmployeeInfo {
     std::string gender = "м";
     std::string marital_status = "холост";
     std::string date;
-
-    bool operator==(const EmployeeInfo&) const = default;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::EmployeeInfo& employee) {
@@ -177,8 +169,6 @@ struct JobTitleInfo {
     int job_title_id;
     std::string job_title;
 
-    bool operator==(const JobTitleInfo&) const = default;
-
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::JobTitleInfo& job_title) {
         jv = {
@@ -203,8 +193,6 @@ struct OrderInfo {
     int personnel_number;
     std::string content;
     std::string date;
-
-    bool operator==(const OrderInfo&) const = default;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv, const
                            ui::detail::OrderInfo& order) {
@@ -236,9 +224,6 @@ struct StaffingTableInfo {
     int salary;
     int time_job = 1;
 
-    bool operator==(const StaffingTableInfo&) const = default;
-
-
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::StaffingTableInfo& staffing_table) {
         jv = {
@@ -269,8 +254,6 @@ struct TimeSheetInfo {
     int personnel_number;
     int time_worked;
     std::string month;
-
-    bool operator==(const TimeSheetInfo&) const = default;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::TimeSheetInfo& time_sheet) {
@@ -304,8 +287,6 @@ struct VacationInfo {
     std::string to_date;
     int days;
     std::string leave_basis;
-
-    bool operator==(const VacationInfo&) const = default;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::VacationInfo& vacation) {
