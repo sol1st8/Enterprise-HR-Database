@@ -4,6 +4,9 @@
 #include <pqxx/zview.hxx>
 #include <pqxx/pqxx>
 
+#include <stdexcept>
+#include <iostream>
+
 namespace postgres {
 using namespace std::literals;
 using pqxx::operator"" _zv;
@@ -277,21 +280,21 @@ DataBase::DataBase(const std::string& db_url)
     , time_sheet_{pool_}
     , vacations_{pool_} {}
 
-WorkerImpl::WorkerImpl(pqxx::connection& conn) : conn_(conn), work_(conn) {}
+WorkerImpl::WorkerImpl(pqxx::connection& conn) : conn_(conn), nontr_(conn) {}
 
 void WorkerImpl::AddBusinessTrip(const domain::BusinessTrip& trip) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     INSERT INTO Командировка (НомерЗаписи, Страна, Город, Организация,
                               СДата, ПоДату, КоличествоДней, Цель) VALUES
-                              ($1, $2, $3, $4, $5, $6, $7, $8);
+                             ($1, $2, $3, $4, $5, $6, $7, $8);
     )"_zv,
         trip.GetTripId(), trip.GetCountry(), trip.GetCity(), trip.GetOrganization(),
         trip.GetFromDate(), trip.GetToDate(), trip.GetDays(), trip.GetTarget());
 }
 
 void WorkerImpl::DeleteBusinessTrip(const domain::BusinessTrip& trip) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM Командировка WHERE НомерЗаписи=$1;
     )"_zv,
@@ -299,7 +302,7 @@ void WorkerImpl::DeleteBusinessTrip(const domain::BusinessTrip& trip) {
 }
 
 void WorkerImpl::UpdateBusinessTrip(const domain::BusinessTrip& trip) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE Командировка SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
     )"_zv,
@@ -307,7 +310,7 @@ void WorkerImpl::UpdateBusinessTrip(const domain::BusinessTrip& trip) {
 }
 
 void WorkerImpl::AddCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     INSERT INTO СоставКомандировки (ТабельныйНомер, НомерЗаписи) VALUES
                               ($1, $2);
@@ -316,7 +319,7 @@ void WorkerImpl::AddCompositionBusinessTrip(const domain::CompositionBusinessTri
 }
 
 void WorkerImpl::DeleteCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM СоставКомандировки WHERE НомерЗаписи=$1;
     )"_zv,
@@ -324,7 +327,7 @@ void WorkerImpl::DeleteCompositionBusinessTrip(const domain::CompositionBusiness
 }
 
 void WorkerImpl::UpdateCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE СоставКомандировки SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
     )"_zv,
@@ -332,7 +335,7 @@ void WorkerImpl::UpdateCompositionBusinessTrip(const domain::CompositionBusiness
 }
 
 void WorkerImpl::AddDepartment(const domain::Department& dep) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     INSERT INTO Отдел (КодОтдела, ТабельныйНомерРуководителя, Название, НомерКабинета) VALUES ($1, $2, $3, $4);
     )"_zv,
@@ -340,7 +343,7 @@ void WorkerImpl::AddDepartment(const domain::Department& dep) {
 }
 
 void WorkerImpl::DeleteDepartment(const domain::Department& dep) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM Отдел WHERE КодОтдела=$1;
     )"_zv,
@@ -348,7 +351,7 @@ void WorkerImpl::DeleteDepartment(const domain::Department& dep) {
 }
 
 void WorkerImpl::UpdateDepartment(const domain::Department& dep) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE Отдел SET КодОтдела=КодОтдела + 1 WHERE КодОтдела=$1;
     )"_zv,
@@ -357,7 +360,7 @@ void WorkerImpl::UpdateDepartment(const domain::Department& dep) {
 
 void WorkerImpl::AddEmployee(const domain::Employee& employee) {
     if (employee.GetExperience().has_value()) {
-        work_.exec_params(
+        nontr_.exec_params(
             R"(
         INSERT INTO Сотрудник (ТабельныйНомер, ФИО, Пол, КодДолжности, Стаж,
                                Телефон, Прописка, Образование, ДатаПриема,
@@ -369,7 +372,7 @@ void WorkerImpl::AddEmployee(const domain::Employee& employee) {
             employee.GetEducation(), employee.GetDate(), employee.GetMail(), employee.GetMerialStatus());
     }
     else {
-        work_.exec_params(
+        nontr_.exec_params(
             R"(
         INSERT INTO Сотрудник (ТабельныйНомер, ФИО, Пол, КодДолжности,
                                Телефон, Прописка, Образование, ДатаПриема,
@@ -383,7 +386,7 @@ void WorkerImpl::AddEmployee(const domain::Employee& employee) {
 }
 
 void WorkerImpl::DeleteEmployee(const domain::Employee& employee) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM Сотрудник WHERE ТабельныйНомер=$1;
     )"_zv,
@@ -391,7 +394,7 @@ void WorkerImpl::DeleteEmployee(const domain::Employee& employee) {
 }
 
 void WorkerImpl::UpdateEmployee(const domain::Employee& employee) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE Сотрудник SET ТабельныйНомер=ТабельныйНомер + 1 WHERE ТабельныйНомер=$1;
     )"_zv,
@@ -399,7 +402,7 @@ void WorkerImpl::UpdateEmployee(const domain::Employee& employee) {
 }
 
 void WorkerImpl::AddJobTitle(const domain::JobTitle& job_title) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     INSERT INTO Должность (КодДолжности, Название) VALUES ($1, $2);
     )"_zv,
@@ -407,7 +410,7 @@ void WorkerImpl::AddJobTitle(const domain::JobTitle& job_title) {
 }
 
 void WorkerImpl::DeleteJobTitle(const domain::JobTitle& job_title) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM Должность WHERE КодДолжности=$1;
     )"_zv,
@@ -415,7 +418,7 @@ void WorkerImpl::DeleteJobTitle(const domain::JobTitle& job_title) {
 }
 
 void WorkerImpl::UpdateJobTitle(const domain::JobTitle& job_title) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE Должность SET КодДолжности=КодДолжности + 1 WHERE КодДолжности=$1;
     )"_zv,
@@ -423,7 +426,7 @@ void WorkerImpl::UpdateJobTitle(const domain::JobTitle& job_title) {
 }
 
 void WorkerImpl::AddOrder(const domain::Order& order) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     INSERT INTO Приказ (НомерПриказа, ТабельныйНомер, ДатаОформления, Содержание) VALUES ($1, $2, $3, $4);
     )"_zv,
@@ -431,7 +434,7 @@ void WorkerImpl::AddOrder(const domain::Order& order) {
 }
 
 void WorkerImpl::DeleteOrder(const domain::Order& order) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM Приказ WHERE НомерПриказа=$1;
     )"_zv,
@@ -439,7 +442,7 @@ void WorkerImpl::DeleteOrder(const domain::Order& order) {
 }
 
 void WorkerImpl::UpdateOrder(const domain::Order& order) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE Приказ SET НомерПриказа=НомерПриказа + 1 WHERE НомерПриказа=$1;
     )"_zv,
@@ -447,7 +450,7 @@ void WorkerImpl::UpdateOrder(const domain::Order& order) {
 }
 
 void WorkerImpl::AddStaffingTable(const domain::StaffingTable& staffing_table) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     INSERT INTO ШтатноеРасписание (НомерЗаписи, КодДолжности, КодОтдела, КоличествоСтавок, Оклад) VALUES ($1, $2, $3, $4, $5);
     )"_zv,
@@ -456,7 +459,7 @@ void WorkerImpl::AddStaffingTable(const domain::StaffingTable& staffing_table) {
 }
 
 void WorkerImpl::DeleteStaffingTable(const domain::StaffingTable& staffing_table) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM ШтатноеРасписание WHERE НомерЗаписи=$1;
     )"_zv,
@@ -464,7 +467,7 @@ void WorkerImpl::DeleteStaffingTable(const domain::StaffingTable& staffing_table
 }
 
 void WorkerImpl::UpdateStaffingTable(const domain::StaffingTable& staffing_table) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE ШтатноеРасписание SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
     )"_zv,
@@ -472,7 +475,7 @@ void WorkerImpl::UpdateStaffingTable(const domain::StaffingTable& staffing_table
 }
 
 void WorkerImpl::AddTimeSheet(const domain::TimeSheet& time_sheet) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     INSERT INTO ТабельУчетаРабочегоВремени (НомерЗаписи, ТабельныйНомер, ОтработанноеВремя, Месяц) VALUES ($1, $2, $3, $4);
     )"_zv,
@@ -480,7 +483,7 @@ void WorkerImpl::AddTimeSheet(const domain::TimeSheet& time_sheet) {
 }
 
 void WorkerImpl::DeleteTimeSheet(const domain::TimeSheet& time_sheet) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM ТабельУчетаРабочегоВремени WHERE НомерЗаписи=$1;
     )"_zv,
@@ -488,7 +491,7 @@ void WorkerImpl::DeleteTimeSheet(const domain::TimeSheet& time_sheet) {
 }
 
 void WorkerImpl::UpdateTimeSheet(const domain::TimeSheet& time_sheet) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE ТабельУчетаРабочегоВремени SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
     )"_zv,
@@ -496,7 +499,7 @@ void WorkerImpl::UpdateTimeSheet(const domain::TimeSheet& time_sheet) {
 }
 
 void WorkerImpl::AddVacation(const domain::Vacation& vacation) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     INSERT INTO Отпуск (НомерЗаписи, ТабельныйНомер, ВидОтпуска, ДатаОтпуска,
                         ДатаОкончания, КоличествоДней, Основание)
@@ -507,7 +510,7 @@ void WorkerImpl::AddVacation(const domain::Vacation& vacation) {
 }
 
 void WorkerImpl::DeleteVacation(const domain::Vacation& vacation) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     DELETE FROM Отпуск WHERE НомерЗаписи=$1;
     )"_zv,
@@ -515,19 +518,13 @@ void WorkerImpl::DeleteVacation(const domain::Vacation& vacation) {
 }
 
 void WorkerImpl::UpdateVacation(const domain::Vacation& vacation) {
-    work_.exec_params(
+    nontr_.exec_params(
         R"(
     UPDATE Отпуск SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
     )"_zv,
         vacation.GetVacationId());
 }
 
-void WorkerImpl::Commit() {;
-    work_.commit();
-}
-
-WorkerImpl::~WorkerImpl() {
-    work_.commit();
-}
+WorkerImpl::~WorkerImpl() = default;
 
 } // namespace postgres

@@ -25,6 +25,12 @@ void RunWorkers(unsigned n, const Fn& fn) {
         workers.emplace_back(fn);
     }
     fn();
+
+    for (auto& worker : workers) {
+        if (worker.joinable()) {
+            worker.join();
+        }
+    }
 }
 
 } // namespace

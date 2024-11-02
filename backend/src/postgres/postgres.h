@@ -52,13 +52,11 @@ class WorkerImpl : public domain::Worker {
     void DeleteVacation(const domain::Vacation& vacation) override;
     void UpdateVacation(const domain::Vacation& vacation) override;
 
-    void Commit() override;
-
     ~WorkerImpl() override;
 
   private:
     pqxx::connection& conn_;
-    pqxx::work work_;
+    pqxx::nontransaction nontr_;
 };
 
 class BusinessTripRepositoryImpl : public domain::BusinessTripRepository {

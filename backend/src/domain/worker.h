@@ -51,8 +51,6 @@ class Worker {
     virtual void DeleteVacation(const domain::Vacation& vacation) = 0;
     virtual void UpdateVacation(const domain::Vacation& vacation) = 0;
 
-    virtual void Commit() = 0;
-
   protected:
     virtual ~Worker() = default;
 };

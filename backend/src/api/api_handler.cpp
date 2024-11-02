@@ -1,4 +1,24 @@
 #include "api_handler.h"
+#include <algorithm>
+#include <string>
+
+namespace {
+
+std::string CleanErrorMessage(const std::string& message) {
+    std::string cleaned_message = message;
+
+
+    size_t detail_pos = message.find("DETAIL:");
+    if (detail_pos != std::string::npos) {
+        cleaned_message = message.substr(detail_pos + 9);
+    }
+
+    cleaned_message.erase(std::remove(cleaned_message.begin(), cleaned_message.end(), '\"'), cleaned_message.end());
+    cleaned_message.erase(std::remove(cleaned_message.begin(), cleaned_message.end(), '\n'), cleaned_message.end());
+    return cleaned_message;
+}
+
+} // namespace
 
 namespace api_handler {
 
@@ -102,11 +122,19 @@ void ApiHandler::HandleAddBusinessTrip() {
     }
 
     ui::detail::BusinessTripInfo trip = json::value_to<ui::detail::BusinessTripInfo>(jv);
-    if (application_.GetUseCases().GetCountBusinessTrips() + 1 != trip.trip_id) {
-        SendBadRequestResponse("Ошибка НомерЗаписи = НомерЗаписи + 1"s);
+    if (application_.GetUseCases().GetCountBusinessTrips() + 1 !=
+trip.trip_id) { SendBadRequestResponse("Ошибка НомерЗаписи = НомерЗаписи + 1"s);
         return;
     }
-    application_.GetUseCases().AddBusinessTrip(trip);
+
+    try {
+        application_.GetUseCases().AddBusinessTrip(trip);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
+        return;
+    }
+
     SendOkResponse({});
 }
 
@@ -117,17 +145,16 @@ void ApiHandler::HandleAddCompositionBusinessTrip() {
     }
 
     json::value jv = json::parse(req_info_.body);
-
     ui::detail::CompositionBusinessTripInfo trip = json::value_to<ui::detail::CompositionBusinessTripInfo>(jv);
-    if (application_.GetUseCases().GetCountEmployees() < trip.personnel_number) {
-        SendBadRequestResponse("Key is not present in table Сотрудник"s);
+
+    try {
+        application_.GetUseCases().AddCompositionBusinessTrip(trip);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
         return;
     }
-    if (application_.GetUseCases().GetCountBusinessTrips() < trip.trip_id) {
-        SendBadRequestResponse("Key is not present in table Командировка"s);
-        return;
-    }
-    application_.GetUseCases().AddCompositionBusinessTrip(trip);
+
     SendOkResponse({});
 }
 
@@ -140,15 +167,19 @@ void ApiHandler::HandleAddDepartment() {
     json::value jv = json::parse(req_info_.body);
 
     ui::detail::DepartmentInfo dep = json::value_to<ui::detail::DepartmentInfo>(jv);
-    if (application_.GetUseCases().GetCountEmployees() < dep.department_id) {
-        SendBadRequestResponse("Key is not present in table Сотрудник"s);
-        return;
-    }
     if (application_.GetUseCases().GetCountDepartments() + 1 != dep.department_id) {
         SendBadRequestResponse("Ошибка КодОтдела != КодОтдела + 1"s);
         return;
     }
-    application_.GetUseCases().AddDepartment(dep);
+
+    try {
+        application_.GetUseCases().AddDepartment(dep);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
+        return;
+    }
+
     SendOkResponse({});
 }
 
@@ -168,15 +199,19 @@ void ApiHandler::HandleAddEmployee() {
     }
 
     ui::detail::EmployeeInfo employee = json::value_to<ui::detail::EmployeeInfo>(jv);
-    if (application_.GetUseCases().GetCountJobTitles() < employee.job_title_id) {
-        SendBadRequestResponse("Key is not present in table Должность"s);
-        return;
-    }
     if (application_.GetUseCases().GetCountEmployees() + 1 != employee.personnel_number) {
         SendBadRequestResponse("Ошибка ТабельныйНомер != ТабельныйНомер + 1"s);
         return;
     }
-    application_.GetUseCases().AddEmployee(employee);
+
+    try {
+        application_.GetUseCases().AddEmployee(employee);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
+        return;
+    }
+
     SendOkResponse({});
 }
 
@@ -193,7 +228,15 @@ void ApiHandler::HandleAddJobTitle() {
         SendBadRequestResponse("Ошибка КодДолжности != КодДолжности + 1"s);
         return;
     }
-    application_.GetUseCases().AddJobTitle(job_title);
+
+    try {
+        application_.GetUseCases().AddJobTitle(job_title);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
+        return;
+    }
+
     SendOkResponse({});
 }
 
@@ -210,11 +253,15 @@ void ApiHandler::HandleAddOrder() {
         SendBadRequestResponse("Ошибка НомерПриказа != НомерПриказа + 1"s);
         return;
     }
-    if (application_.GetUseCases().GetCountEmployees() < order.personnel_number) {
-        SendBadRequestResponse("Key is not present in table Сотрудник"s);
+
+    try {
+        application_.GetUseCases().AddOrder(order);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
         return;
     }
-    application_.GetUseCases().AddOrder(order);
+
     SendOkResponse({});
 }
 
@@ -242,15 +289,15 @@ void ApiHandler::HandleAddStaffingTable() {
         SendBadRequestResponse("Ошибка НомерЗаписи != НомерЗаписи + 1"s);
         return;
     }
-    if (application_.GetUseCases().GetCountJobTitles() < staffing_table.job_title_id) {
-        SendBadRequestResponse("Key is not present in table Должность"s);
+
+    try {
+        application_.GetUseCases().AddStaffingTable(staffing_table);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
         return;
     }
-    if (application_.GetUseCases().GetCountDepartments() < staffing_table.department_id) {
-        SendBadRequestResponse("Key is not present in table Отдел"s);
-        return;
-    }
-    application_.GetUseCases().AddStaffingTable(staffing_table);
+
     SendOkResponse({});
 }
 
@@ -281,11 +328,15 @@ month == "декабрь")) { SendBadRequestResponse("Ошибка Месяц н
         SendBadRequestResponse("Ошибка НомерЗаписи != НомерЗаписи + 1"s);
         return;
     }
-    if (application_.GetUseCases().GetCountEmployees() < time_sheet.personnel_number) {
-        SendBadRequestResponse("Key is not present in table Сотрудник"s);
+
+    try {
+        application_.GetUseCases().AddTimeSheet(time_sheet);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
         return;
     }
-    application_.GetUseCases().AddTimeSheet(time_sheet);
+
     SendOkResponse({});
 }
 
@@ -316,11 +367,15 @@ void ApiHandler::HandleAddVacation() {
         SendBadRequestResponse("Ошибка НомерЗаписи != НомерЗаписи + 1"s);
         return;
     }
-    if (application_.GetUseCases().GetCountEmployees() < vacation.personnel_number) {
-        SendBadRequestResponse("Key is not present in table Сотрудник"s);
+
+    try {
+        application_.GetUseCases().AddVacation(vacation);
+    }
+    catch (const std::exception& e) {
+        SendBadRequestResponse(CleanErrorMessage(e.what()));
         return;
     }
-    application_.GetUseCases().AddVacation(vacation);
+
     SendOkResponse({});
 }
 
