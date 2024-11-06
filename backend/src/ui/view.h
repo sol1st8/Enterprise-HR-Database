@@ -1,12 +1,12 @@
 #pragma once
 
 #include <boost/json.hpp>
-
 #include <chrono>
 #include <iosfwd>
 #include <optional>
 #include <sstream>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace app {
@@ -21,13 +21,13 @@ using namespace std::literals;
 
 struct BusinessTripInfo {
     int trip_id;
+    std::string country;
     std::string city;
     std::string organization;
     std::string from_date;
     std::string to_date;
     int days;
     std::string target;
-    std::string country = "Россия";
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::BusinessTripInfo& trip) {
@@ -45,7 +45,8 @@ struct BusinessTripInfo {
 
     friend ui::detail::BusinessTripInfo
     tag_invoke(json::value_to_tag<ui::detail::BusinessTripInfo>&, const json::value&
-               trip) { ui::detail::BusinessTripInfo tr;
+               trip) {
+        ui::detail::BusinessTripInfo tr;
 
         tr.trip_id = trip.at("НомерЗаписи").as_int64();
         tr.country = trip.at("Страна").as_string();
@@ -74,7 +75,8 @@ struct CompositionBusinessTripInfo {
 
     friend ui::detail::CompositionBusinessTripInfo
     tag_invoke(json::value_to_tag<ui::detail::CompositionBusinessTripInfo>&, const
-               json::value& trip) { ui::detail::CompositionBusinessTripInfo tr;
+               json::value& trip) {
+        ui::detail::CompositionBusinessTripInfo tr;
 
         tr.personnel_number = trip.at("ТабельныйНомер").as_int64();
         tr.trip_id = trip.at("НомерЗаписи").as_int64();
@@ -116,15 +118,15 @@ struct DepartmentInfo {
 struct EmployeeInfo {
     int personnel_number;
     std::string full_name;
-    int job_title_id;
+    std::string gender;
+    std::variant<std::string, int> job_title;
     std::optional<int> experience;
     std::string number;
     std::string registration;
     std::string education;
-    std::string mail;
-    std::string gender = "м";
-    std::string marital_status = "холост";
     std::string date;
+    std::string mail;
+    std::string marital_status;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::EmployeeInfo& employee) {
@@ -132,7 +134,7 @@ struct EmployeeInfo {
             {"ТабельныйНомер"s, employee.personnel_number},
             {"ФИО"s, employee.full_name},
             {"Пол"s, employee.gender},
-            {"КодДолжности"s, employee.job_title_id},
+            {"КодДолжности"s, std::get<std::string>(employee.job_title)},
             {"Стаж"s, employee.experience ? std::to_string(*employee.experience) : "NULL"},
             {"Телефон"s, employee.number},
             {"Прописка"s, employee.registration},
@@ -145,12 +147,13 @@ struct EmployeeInfo {
 
     friend ui::detail::EmployeeInfo
     tag_invoke(json::value_to_tag<ui::detail::EmployeeInfo>&, const json::value&
-               employee) { ui::detail::EmployeeInfo emp;
+               employee) {
+        ui::detail::EmployeeInfo emp;
 
         emp.personnel_number = employee.at("ТабельныйНомер").as_int64();
         emp.full_name = employee.at("ФИО").as_string();
         emp.gender = employee.at("Пол").as_string();
-        emp.job_title_id = employee.at("КодДолжности").as_int64();
+        emp.job_title = static_cast<int>(employee.at("КодДолжности").as_int64());
         if (employee.as_object().if_contains("Стаж")) {
             emp.experience = employee.at("Стаж").as_int64();
         }
@@ -179,7 +182,8 @@ struct JobTitleInfo {
 
     friend ui::detail::JobTitleInfo
     tag_invoke(json::value_to_tag<ui::detail::JobTitleInfo>&, const json::value&
-               job_title) { ui::detail::JobTitleInfo job_t;
+               job_title) {
+        ui::detail::JobTitleInfo job_t;
 
         job_t.job_title_id = job_title.at("КодДолжности").as_int64();
         job_t.job_title = job_title.at("Название").as_string();
@@ -191,8 +195,8 @@ struct JobTitleInfo {
 struct OrderInfo {
     int order_id;
     int personnel_number;
-    std::string content;
     std::string date;
+    std::string content;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv, const
                            ui::detail::OrderInfo& order) {
@@ -219,17 +223,17 @@ struct OrderInfo {
 
 struct StaffingTableInfo {
     int staffing_table_id;
-    int job_title_id;
-    int department_id;
+    std::variant<std::string, int> job_title;
+    std::variant<std::string, int> department;
+    int time_job;
     int salary;
-    int time_job = 1;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::StaffingTableInfo& staffing_table) {
         jv = {
             {"НомерЗаписи"s, staffing_table.staffing_table_id},
-            {"КодДолжности"s, staffing_table.job_title_id},
-            {"КодОтдела"s, staffing_table.department_id},
+            {"КодДолжности"s, std::get<std::string>(staffing_table.job_title)},
+            {"КодОтдела"s, std::get<std::string>(staffing_table.department)},
             {"КоличествоСтавок"s, staffing_table.time_job},
             {"Оклад"s, staffing_table.salary}
         };
@@ -237,11 +241,12 @@ struct StaffingTableInfo {
 
     friend ui::detail::StaffingTableInfo
     tag_invoke(json::value_to_tag<ui::detail::StaffingTableInfo>&, const
-               json::value& staffing_table) { ui::detail::StaffingTableInfo staf_t;
+               json::value& staffing_table) {
+        ui::detail::StaffingTableInfo staf_t;
 
         staf_t.staffing_table_id = staffing_table.at("НомерЗаписи").as_int64();
-        staf_t.job_title_id = staffing_table.at("КодДолжности").as_int64();
-        staf_t.department_id = staffing_table.at("КодОтдела").as_int64();
+        staf_t.job_title = static_cast<int>(staffing_table.at("КодДолжности").as_int64());
+        staf_t.department = static_cast<int>(staffing_table.at("КодОтдела").as_int64());
         staf_t.time_job = staffing_table.at("КоличествоСтавок").as_int64();
         staf_t.salary = staffing_table.at("Оклад").as_int64();
 

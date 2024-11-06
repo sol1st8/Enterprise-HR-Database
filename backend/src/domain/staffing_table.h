@@ -16,8 +16,8 @@ class StaffingTable {
                   int salary, int time_job) : staffing_table_id_(staffing_table_id)
                                             , job_title_id_(job_title_id)
                                             , department_id_(department_id)
-                                            , salary_(salary)
-                                            , time_job_(time_job) {}
+                                            , time_job_(time_job)
+                                            , salary_(salary) {}
 
     int GetStaffingTableId() const noexcept {
         return staffing_table_id_;
@@ -31,20 +31,20 @@ class StaffingTable {
         return department_id_;
     }
 
-    int GetSalary() const noexcept {
-        return salary_;
-    }
-
     int GetTimeJob() const noexcept {
         return time_job_;
+    }
+
+    int GetSalary() const noexcept {
+        return salary_;
     }
 
   private:
     int staffing_table_id_;
     int job_title_id_;
     int department_id_;
+    int time_job_;
     int salary_;
-    int time_job_ = 1;
 };
 
 class StaffingTableRepository {

@@ -10,24 +10,20 @@ class Worker;
 
 class Employee {
   public:
-    Employee(int personnel_number, std::string full_name, int job_title_id,
-             std::optional<int> experience, std::string number, std::string registration,
-             std::string education, std::string mail, std::string gender,
-             std::string marital_status, std::string date = "") : personnel_number_(personnel_number)
-                                                                , full_name_(std::move(full_name))
-                                                                , job_title_id_(job_title_id)
-                                                                , experience_(experience)
-                                                                , number_(std::move(number))
-                                                                , registration_(std::move(registration))
-                                                                , education_(std::move(education))
-                                                                , mail_(std::move(mail))
-                                                                , gender_(std::move(gender))
-                                                                , marital_status_(std::move(marital_status))
-                                                                , date_(std::move(date)) {
-        if (date_.empty()) {
-            date_ = std::move(GetCurrentDate());
-        }
-    }
+    Employee(int personnel_number, std::string full_name, std::string gender,
+             int job_title_id, std::optional<int> experience, std::string number,
+             std::string registration, std::string education, std::string date,
+             std::string mail, std::string marital_status) : personnel_number_(personnel_number)
+                                                           , full_name_(std::move(full_name))
+                                                           , gender_(std::move(gender))
+                                                           , job_title_id_(job_title_id)
+                                                           , experience_(experience)
+                                                           , number_(std::move(number))
+                                                           , registration_(std::move(registration))
+                                                           , education_(std::move(education))
+                                                           , date_(std::move(date))
+                                                           , mail_(std::move(mail))
+                                                           , marital_status_(std::move(marital_status)) {}
 
     int GetPersonnelNumber() const noexcept {
         return personnel_number_;
@@ -35,6 +31,10 @@ class Employee {
 
     const std::string& GetFullName() const noexcept {
         return full_name_;
+    }
+
+    const std::string& GetGender() const noexcept {
+        return gender_;
     }
 
     int GetJobTitleId() const noexcept {
@@ -57,43 +57,30 @@ class Employee {
         return education_;
     }
 
-    const std::string& GetMail() const noexcept {
-        return mail_;
+    const std::string& GetDate() const noexcept {
+        return date_;
     }
 
-    const std::string&  GetGender() const noexcept {
-        return gender_;
+    const std::string& GetMail() const noexcept {
+        return mail_;
     }
 
     const std::string& GetMerialStatus() const noexcept {
         return marital_status_;
     }
 
-    const std::string& GetDate() const noexcept {
-        return date_;
-    }
-
   private:
     int personnel_number_;
     std::string full_name_;
+    std::string gender_;
     int job_title_id_;
     std::optional<int> experience_;
     std::string number_;
     std::string registration_;
     std::string education_;
-    std::string mail_;
-    std::string gender_ = "м";
-    std::string marital_status_ = "холост";
     std::string date_;
-
-    static std::string GetCurrentDate() {
-        const auto now = std::chrono::system_clock::now();
-        const auto t_c = std::chrono::system_clock::to_time_t(now);
-
-        std::ostringstream oss;
-        oss << std::put_time(std::gmtime(&t_c), "%Y_%m_%d");
-        return oss.str();
-    }
+    std::string mail_;
+    std::string marital_status_;
 };
 
 class EmployeeRepository {

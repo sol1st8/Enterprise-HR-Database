@@ -1,5 +1,6 @@
 #pragma once
 
+#include "use_cases.h"
 #include "../domain/business_trip_fwd.h"
 #include "../domain/composition_business_trip_fwd.h"
 #include "../domain/department_fwd.h"
@@ -9,7 +10,6 @@
 #include "../domain/staffing_table_fwd.h"
 #include "../domain/time_sheet_fwd.h"
 #include "../domain/vacation_fwd.h"
-#include "use_cases.h"
 
 namespace app {
 
@@ -20,10 +20,10 @@ class UseCasesImpl : public UseCases {
                           domain::DepartmentRepository& deps,
                           domain::EmployeeRepository& employees,
                           domain::JobTitleRepository& job_titles,
-                          domain::OrderRepository& order,
+                          domain::OrderRepository& orders,
                           domain::StaffingTableRepository& staffing_table,
                           domain::TimeSheetRepository& time_sheet,
-                          domain::VacationRepository& vacation);
+                          domain::VacationRepository& vacations);
 
     void AddBusinessTrip(const ui::detail::BusinessTripInfo& trip) override;
     void DeleteBusinessTrip(const ui::detail::BusinessTripInfo& trip) override;
@@ -78,6 +78,12 @@ class UseCasesImpl : public UseCases {
     int GetCountStaffingTable() const override;
     int GetCountTimeSheet() const override;
     int GetCountVacations() const override;
+
+    std::string GetDepartment(int id) const override;
+    int GetDepartmentId(const std::string& dep) const override;
+
+    std::string GetJobTitle(int id) const override;
+    int GetJobTitleId(const std::string& job_title) const override;
 
   private:
     domain::BusinessTripRepository& trips_;

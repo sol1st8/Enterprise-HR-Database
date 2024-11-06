@@ -1,12 +1,11 @@
 #include "api_handler.h"
+
 #include <algorithm>
-#include <string>
 
 namespace {
 
 std::string CleanErrorMessage(const std::string& message) {
     std::string cleaned_message = message;
-
 
     size_t detail_pos = message.find("DETAIL:");
     if (detail_pos != std::string::npos) {
@@ -112,6 +111,7 @@ void ApiHandler::HandleAddBusinessTrip() {
         SendBadRequestResponse("Ошибка КоличествоДней <= 0"s);
         return;
     }
+
     std::string from_date;
     std::string to_date;
     from_date = jv.at("СДата").as_string();
@@ -123,7 +123,8 @@ void ApiHandler::HandleAddBusinessTrip() {
 
     ui::detail::BusinessTripInfo trip = json::value_to<ui::detail::BusinessTripInfo>(jv);
     if (application_.GetUseCases().GetCountBusinessTrips() + 1 !=
-trip.trip_id) { SendBadRequestResponse("Ошибка НомерЗаписи = НомерЗаписи + 1"s);
+trip.trip_id) {
+        SendBadRequestResponse("Ошибка НомерЗаписи != НомерЗаписи + 1"s);
         return;
     }
 
@@ -190,6 +191,13 @@ void ApiHandler::HandleAddEmployee() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    std::string job_title;
+    job_title = jv.at("КодДолжности").as_string();
+    jv.as_object()["КодДолжности"] = application_.GetUseCases().GetJobTitleId(job_title);
+    if (jv.at("КодДолжности").as_int64() == -1) {
+        SendBadRequestResponse("Ошибка Должность не существует"s);
+        return;
+    }
 
     std::string gender;
     gender = jv.at("Пол").as_string();
@@ -197,7 +205,6 @@ void ApiHandler::HandleAddEmployee() {
         SendBadRequestResponse("Ошибка Пол = м или ж"s);
         return;
     }
-
     ui::detail::EmployeeInfo employee = json::value_to<ui::detail::EmployeeInfo>(jv);
     if (application_.GetUseCases().GetCountEmployees() + 1 != employee.personnel_number) {
         SendBadRequestResponse("Ошибка ТабельныйНомер != ТабельныйНомер + 1"s);
@@ -272,12 +279,28 @@ void ApiHandler::HandleAddStaffingTable() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    std::string job_title;
+    job_title = jv.at("КодДолжности").as_string();
+    jv.as_object()["КодДолжности"] = application_.GetUseCases().GetJobTitleId(job_title);
+    if (jv.at("КодДолжности").as_int64() == -1) {
+        SendBadRequestResponse("Ошибка Должность не существует"s);
+        return;
+    }
+
+    std::string dep_name;
+    dep_name = jv.at("КодОтдела").as_string();
+    jv.as_object()["КодОтдела"] = application_.GetUseCases().GetDepartmentId(dep_name);
+    if (jv.at("КодОтдела").as_int64() == -1) {
+        SendBadRequestResponse("Ошибка Отдел не существует"s);
+        return;
+    }
 
     int time_job = jv.at("КоличествоСтавок").as_int64();
     if (time_job <= 0) {
         SendBadRequestResponse("Ошибка КоличествоСтавок <= 0"s);
         return;
     }
+
     int salary = jv.at("Оклад").as_int64();
     if (salary <= 0) {
         SendBadRequestResponse("Ошибка Оклад <= 0"s);
@@ -353,6 +376,7 @@ void ApiHandler::HandleAddVacation() {
         SendBadRequestResponse("Ошибка КоличествоДней <= 0"s);
         return;
     }
+
     std::string from_date;
     std::string to_date;
     from_date = jv.at("ДатаОтпуска").as_string();
@@ -499,6 +523,7 @@ void ApiHandler::HandleGetStaffingTable() {
     if (CheckEndPath()) {
         json::value jv = json::value_from(application_.GetUseCases().GetStaffingTable());
         SendOkResponse(json::serialize(jv));
+        return;
     }
     return SendBadRequestResponseDefault();
 }
@@ -511,6 +536,7 @@ void ApiHandler::HandleGetTimeSheet() {
     if (CheckEndPath()) {
         json::value jv = json::value_from(application_.GetUseCases().GetTimeSheet());
         SendOkResponse(json::serialize(jv));
+        return;
     }
     return SendBadRequestResponseDefault();
 }
@@ -523,6 +549,7 @@ void ApiHandler::HandleGetVacations() {
     if (CheckEndPath()) {
         json::value jv = json::value_from(application_.GetUseCases().GetVacations());
         SendOkResponse(json::serialize(jv));
+        return;
     }
     return SendBadRequestResponseDefault();
 }

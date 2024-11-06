@@ -13,13 +13,14 @@ class Worker;
 class Vacation {
   public:
     Vacation(int vacation_id, int personnel_number, std::string type,
-             std::string from_date, std::string to_date, int days, std::string leave_basis) : vacation_id_(vacation_id)
-                                                                                            , personnel_number_(personnel_number)
-                                                                                            , type_(std::move(type))
-                                                                                            , from_date_(std::move(from_date))
-                                                                                            , to_date_(std::move(to_date))
-                                                                                            , days_(days)
-                                                                                            , leave_basis_(std::move(leave_basis)) {}
+             std::string from_date, std::string to_date,
+             int days, std::string leave_basis) : vacation_id_(vacation_id)
+                                                , personnel_number_(personnel_number)
+                                                , type_(std::move(type))
+                                                , from_date_(std::move(from_date))
+                                                , to_date_(std::move(to_date))
+                                                , days_(days)
+                                                , leave_basis_(std::move(leave_basis)) {}
 
     int GetVacationId() const noexcept {
         return vacation_id_;

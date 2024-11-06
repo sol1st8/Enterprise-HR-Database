@@ -7,16 +7,15 @@ namespace ui {
 
 namespace detail {
 
-struct JobTitleInfo;
 struct BusinessTripInfo;
+struct CompositionBusinessTripInfo;
 struct DepartmentInfo;
 struct EmployeeInfo;
-struct VacationInfo;
+struct JobTitleInfo;
 struct OrderInfo;
-struct CompositionBusinessTripInfo;
-struct EmployeeInfo;
-struct TimeSheetInfo;
 struct StaffingTableInfo;
+struct TimeSheetInfo;
+struct VacationInfo;
 
 } // namespace detail
 
@@ -79,6 +78,12 @@ class UseCases {
     virtual int GetCountStaffingTable() const = 0;
     virtual int GetCountTimeSheet() const = 0;
     virtual int GetCountVacations() const = 0;
+
+    virtual std::string GetDepartment(int id) const = 0;
+    virtual int GetDepartmentId(const std::string& dep) const = 0;
+
+    virtual std::string GetJobTitle(int id) const = 0;
+    virtual int GetJobTitleId(const std::string& job_title) const = 0;
 
   protected:
     ~UseCases() = default;

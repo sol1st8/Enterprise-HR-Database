@@ -6,7 +6,7 @@ Application::Application(const AppConfig& config)
     : db_(config.db_url) {}
 
 app::UseCasesImpl Application::GetUseCases() const {
-        return use_cases_;
-    }
+    return use_cases_;
+}
 
 } // namespace db

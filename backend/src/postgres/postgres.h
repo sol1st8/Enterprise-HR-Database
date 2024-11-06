@@ -104,6 +104,9 @@ class DepartmentRepositoryImpl : public domain::DepartmentRepository {
 
     int GetCount() const override;
 
+    std::string GetDep(int id) const override;
+    int GetDepId(const std::string& dep) const override;
+
   private:
     connection_pool::ConnectionPool& pool_;
 };
@@ -137,6 +140,9 @@ class JobTitleRepositoryImpl : public domain::JobTitleRepository {
     }
 
     int GetCount() const override;
+
+    std::string GetJobTitle(int id) const override;
+    int GetJobTitleId(const std::string& job_title) const override;
 
   private:
     connection_pool::ConnectionPool& pool_;
@@ -252,6 +258,7 @@ class DataBase {
 
   private:
     connection_pool::ConnectionPool pool_;
+
     BusinessTripRepositoryImpl trips_;
     CompositionBusinessTripRepositoryImpl composition_trips_;
     DepartmentRepositoryImpl deps_;

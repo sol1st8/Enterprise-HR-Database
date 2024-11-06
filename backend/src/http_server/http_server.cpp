@@ -67,6 +67,8 @@ int IntFrom2Hex(char first, char second) {
 }
 
 std::string DecodeURL(std::string_view url) {
+    using namespace std::literals;
+
     size_t size = url.size();
     size_t i = 0;
     std::string result;
@@ -76,11 +78,11 @@ std::string DecodeURL(std::string_view url) {
         char cur = url.at(i);
         if (cur == '%') {
             if (i > size - 3) {
-                throw std::runtime_error("Incorrect url");
+                throw std::runtime_error("Incorrect url"s);
             }
             int hex = IntFrom2Hex(url.at(i + 1), url.at(i + 2));
             if (hex < 0) {
-                throw std::runtime_error("Incorrect hex number");
+                throw std::runtime_error("Incorrect hex number"s);
             }
             result.push_back(static_cast<char>(hex));
             i += 2;

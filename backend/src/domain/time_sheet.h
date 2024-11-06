@@ -12,10 +12,11 @@ class Worker;
 
 class TimeSheet {
   public:
-    TimeSheet(int time_sheet_id, int personnel_number, int time_worked, std::string month) : time_sheet_id_(time_sheet_id)
-                                                                                           , personnel_number_(personnel_number)
-                                                                                           , time_worked_(time_worked)
-                                                                                           , month_(std::move(month)) {}
+    TimeSheet(int time_sheet_id, int personnel_number,
+              int time_worked, std::string month) : time_sheet_id_(time_sheet_id)
+                                                  , personnel_number_(personnel_number)
+                                                  , time_worked_(time_worked)
+                                                  , month_(std::move(month)) {}
 
     int GetTimeSheetId() const noexcept {
         return time_sheet_id_;

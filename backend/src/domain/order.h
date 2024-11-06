@@ -12,14 +12,11 @@ class Worker;
 
 class Order {
   public:
-    Order(int order_id, int personnel_number, std::string content, std::string date = "") : order_id_(order_id)
-                                                                                          , personnel_number_(personnel_number)
-                                                                                          , content_(std::move(content))
-                                                                                          , date_(std::move(date)) {
-        if (date_.empty()) {
-            date_ = std::move(GetCurrentDate());
-        }
-    }
+    Order(int order_id, int personnel_number,
+          std::string date, std::string content) : order_id_(order_id)
+                                                 , personnel_number_(personnel_number)
+                                                 , date_(std::move(date))
+                                                 , content_(std::move(content)) {}
 
     int GetOrderId() const noexcept {
         return order_id_;
@@ -29,28 +26,19 @@ class Order {
         return personnel_number_;
     }
 
-    const std::string& GetContent() const noexcept {
-        return content_;
-    }
-
     const std::string& GetDate() const noexcept {
         return date_;
+    }
+
+    const std::string& GetContent() const noexcept {
+        return content_;
     }
 
   private:
     int order_id_;
     int personnel_number_;
-    std::string content_;
     std::string date_;
-
-    static std::string GetCurrentDate() {
-        const auto now = std::chrono::system_clock::now();
-        const auto t_c = std::chrono::system_clock::to_time_t(now);
-
-        std::ostringstream oss;
-        oss << std::put_time(std::gmtime(&t_c), "%Y_%m_%d");
-        return oss.str();
-    }
+    std::string content_;
 };
 
 class OrderRepository {

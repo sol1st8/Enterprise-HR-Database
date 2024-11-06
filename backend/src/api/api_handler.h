@@ -11,6 +11,7 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <string>
 
 namespace api_handler {
 namespace beast = boost::beast;

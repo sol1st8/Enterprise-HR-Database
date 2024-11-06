@@ -12,10 +12,11 @@ class Worker;
 
 class Department {
   public:
-    Department(int department_id, int manager_personnel_number, std::string dep_name, int office_num) : department_id_(department_id)
-                                                                                                      , manager_personnel_number_(manager_personnel_number)
-                                                                                                      , dep_name_(std::move(dep_name))
-                                                                                                      , office_num_(office_num) {}
+    Department(int department_id, int manager_personnel_number,
+               std::string dep_name, int office_num) : department_id_(department_id)
+                                                     , manager_personnel_number_(manager_personnel_number)
+                                                     , dep_name_(std::move(dep_name))
+                                                     , office_num_(office_num) {}
 
     int GetDepartmentId() const noexcept {
         return department_id_;
@@ -47,6 +48,9 @@ class DepartmentRepository {
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 
     virtual int GetCount() const = 0;
+
+    virtual std::string GetDep(int id) const = 0;
+    virtual int GetDepId(const std::string& dep) const = 0;
 
   protected:
     ~DepartmentRepository() = default;

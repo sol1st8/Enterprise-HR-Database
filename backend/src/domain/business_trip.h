@@ -12,19 +12,23 @@ class Worker;
 
 class BusinessTrip {
   public:
-    BusinessTrip(int trip_id, std::string city, std::string organization,
-                 std::string from_date, std::string to_date, int days,
-                 std::string target, std::string country) : trip_id_(trip_id)
-                                                          , city_(std::move(city))
-                                                          , organization_(std::move(organization))
-                                                          , from_date_(std::move(from_date))
-                                                          , to_date_(std::move(to_date))
-                                                          , days_(days)
-                                                          , target_(std::move(target))
-                                                          , country_(std::move(country)) {}
+    BusinessTrip(int trip_id, std::string country, std::string city,
+                 std::string organization, std::string from_date,
+                 std::string to_date, int days, std::string target) : trip_id_(trip_id)
+                                                                    , country_(std::move(country))
+                                                                    , city_(std::move(city))
+                                                                    , organization_(std::move(organization))
+                                                                    , from_date_(std::move(from_date))
+                                                                    , to_date_(std::move(to_date))
+                                                                    , days_(days)
+                                                                    , target_(std::move(target)) {}
 
     int GetTripId() const noexcept {
         return trip_id_;
+    }
+
+    const std::string& GetCountry() const noexcept {
+        return country_;
     }
 
     const std::string& GetCity() const noexcept {
@@ -51,19 +55,15 @@ class BusinessTrip {
         return target_;
     }
 
-    const std::string& GetCountry() const noexcept {
-        return country_;
-    }
-
   private:
     int trip_id_;
+    std::string country_;
     std::string city_;
     std::string organization_;
     std::string from_date_;
     std::string to_date_;
     int days_;
     std::string target_;
-    std::string country_ = "Россия";
 };
 
 class BusinessTripRepository {

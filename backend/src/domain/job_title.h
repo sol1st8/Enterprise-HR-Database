@@ -36,6 +36,9 @@ class JobTitleRepository {
 
     virtual int GetCount() const = 0;
 
+    virtual std::string GetJobTitle(int id) const = 0;
+    virtual int GetJobTitleId(const std::string& job_title) const = 0;
+
   protected:
     ~JobTitleRepository() = default;
 };
