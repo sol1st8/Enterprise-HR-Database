@@ -562,6 +562,9 @@ ApiHandler::ResponseInfo ApiHandler::MakeResponse(http::status status, bool no_c
     result.content_type = body_type::json;
     result.keep_alive = req_info_.keep_alive;
     result.no_cache = no_cache;
+    result.additional_fields.emplace_back(http::field::access_control_allow_origin, "*"s);
+    result.additional_fields.emplace_back(http::field::access_control_allow_methods, "GET, POST, PUT, DELETE, OPTIONS"s);
+    result.additional_fields.emplace_back(http::field::access_control_allow_headers, "Content-Type, Authorization"s);
 
     return result;
 }
