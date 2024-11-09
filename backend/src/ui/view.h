@@ -135,7 +135,7 @@ struct EmployeeInfo {
             {"ФИО"s, employee.full_name},
             {"Пол"s, employee.gender},
             {"КодДолжности"s, std::get<std::string>(employee.job_title)},
-            {"Стаж"s, employee.experience ? std::to_string(*employee.experience) : "NULL"},
+            {"Стаж"s, employee.experience ? std::to_string(*employee.experience) : "NULL"s},
             {"Телефон"s, employee.number},
             {"Прописка"s, employee.registration},
             {"Образование"s, employee.education},

@@ -16,39 +16,30 @@ namespace domain {
 class Worker {
   public:
     virtual void AddBusinessTrip(const domain::BusinessTrip& trip) = 0;
-    virtual void DeleteBusinessTrip(const domain::BusinessTrip& trip) = 0;
     virtual void UpdateBusinessTrip(const domain::BusinessTrip& trip) = 0;
 
     virtual void AddCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) = 0;
-    virtual void DeleteCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) = 0;
     virtual void UpdateCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) = 0;
 
     virtual void AddDepartment(const domain::Department& dep) = 0;
-    virtual void DeleteDepartment(const domain::Department& dep) = 0;
     virtual void UpdateDepartment(const domain::Department& dep) = 0;
 
     virtual void AddEmployee(const domain::Employee& employee) = 0;
-    virtual void DeleteEmployee(const domain::Employee& employee) = 0;
     virtual void UpdateEmployee(const domain::Employee& employee) = 0;
 
     virtual void AddJobTitle(const domain::JobTitle& job_title) = 0;
-    virtual void DeleteJobTitle(const domain::JobTitle& job_title) = 0;
     virtual void UpdateJobTitle(const domain::JobTitle& job_title) = 0;
 
     virtual void AddOrder(const domain::Order& order) = 0;
-    virtual void DeleteOrder(const domain::Order& order) = 0;
     virtual void UpdateOrder(const domain::Order& order) = 0;
 
     virtual void AddStaffingTable(const domain::StaffingTable& staffing_table) = 0;
-    virtual void DeleteStaffingTable(const domain::StaffingTable& staffing_table) = 0;
     virtual void UpdateStaffingTable(const domain::StaffingTable& staffing_table) = 0;
 
     virtual void AddTimeSheet(const domain::TimeSheet& time_sheet) = 0;
-    virtual void DeleteTimeSheet(const domain::TimeSheet& time_sheet) = 0;
     virtual void UpdateTimeSheet(const domain::TimeSheet& time_sheet) = 0;
 
     virtual void AddVacation(const domain::Vacation& vacation) = 0;
-    virtual void DeleteVacation(const domain::Vacation& vacation) = 0;
     virtual void UpdateVacation(const domain::Vacation& vacation) = 0;
 
   protected:

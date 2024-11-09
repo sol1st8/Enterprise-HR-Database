@@ -14,7 +14,7 @@ std::vector<ui::detail::BusinessTripInfo> BusinessTripRepositoryImpl::Get() cons
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Командировка;"s;
+    std::string query = "SELECT * FROM Командировка ORDER BY НомерЗаписи;"s;
 
     auto resp = tr.query<int, std::string, std::string, std::string,
                          std::string, std::string, int, std::string>(query);
@@ -45,7 +45,7 @@ std::vector<ui::detail::CompositionBusinessTripInfo> CompositionBusinessTripRepo
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM СоставКомандировки;"s;
+    std::string query = "SELECT * FROM СоставКомандировки ORDER BY ТабельныйНомер;"s;
 
     auto resp = tr.query<int, int>(query);
 
@@ -63,7 +63,7 @@ std::string DepartmentRepositoryImpl::GetDep(int id) const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Отдел;"s;
+    std::string query = "SELECT * FROM Отдел ORDER BY КодОтдела;"s;
 
     auto resp = tr.query<int, int, std::string, int>(query);
 
@@ -80,7 +80,7 @@ int DepartmentRepositoryImpl::GetDepId(const std::string& dep) const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Отдел;"s;
+    std::string query = "SELECT * FROM Отдел ORDER BY КодОтдела;"s;
 
     auto resp = tr.query<int, int, std::string, int>(query);
 
@@ -97,7 +97,7 @@ std::vector<ui::detail::DepartmentInfo> DepartmentRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Отдел;"s;
+    std::string query = "SELECT * FROM Отдел ORDER BY КодОтдела;"s;
 
     auto resp = tr.query<int, int, std::string, int>(query);
 
@@ -128,7 +128,7 @@ std::vector<ui::detail::EmployeeInfo> EmployeeRepositoryImpl::Get() const {
 
     JobTitleRepositoryImpl job_titles(pool_);
 
-    std::string query = "SELECT * FROM Сотрудник;"s;
+    std::string query = "SELECT * FROM Сотрудник ORDER BY ТабельныйНомер;"s;
 
     auto resp = tr.query<int, std::string, std::string, int, std::optional<int>, std::string,
                          std::string, std::string, std::string, std::string, std::string>(query);
@@ -162,7 +162,7 @@ std::string JobTitleRepositoryImpl::GetJobTitle(int id) const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Должность;"s;
+    std::string query = "SELECT * FROM Должность ORDER BY КодДолжности;"s;
 
     auto resp = tr.query<int, std::string>(query);
 
@@ -179,7 +179,7 @@ int JobTitleRepositoryImpl::GetJobTitleId(const std::string& job_title) const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Должность;"s;
+    std::string query = "SELECT * FROM Должность ORDER BY КодДолжности;"s;
 
     auto resp = tr.query<int, std::string>(query);
 
@@ -196,7 +196,7 @@ std::vector<ui::detail::JobTitleInfo> JobTitleRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Должность;"s;
+    std::string query = "SELECT * FROM Должность ORDER BY КодДолжности;"s;
 
     auto resp = tr.query<int, std::string>(query);
 
@@ -225,14 +225,14 @@ std::vector<ui::detail::OrderInfo> OrderRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Приказ;"s;
+    std::string query = "SELECT * FROM Приказ ORDER BY НомерПриказа;"s;
 
     auto resp = tr.query<int, int, std::string, std::string>(query);
 
     std::vector<ui::detail::OrderInfo> result;
 
     for (auto& [order_id, personnel_number, date, content] : resp) {
-        ui::detail::OrderInfo order{order_id, personnel_number, content, date};
+        ui::detail::OrderInfo order{order_id, personnel_number, date, content};
         result.push_back(order);
     }
 
@@ -257,7 +257,7 @@ std::vector<ui::detail::StaffingTableInfo> StaffingTableRepositoryImpl::Get() co
     JobTitleRepositoryImpl job_titles(pool_);
     DepartmentRepositoryImpl deps(pool_);
 
-    std::string query = "SELECT * FROM ШтатноеРасписание;"s;
+    std::string query = "SELECT * FROM ШтатноеРасписание ORDER BY НомерЗаписи;"s;
 
     auto resp = tr.query<int, int, int, int, int>(query);
 
@@ -265,7 +265,7 @@ std::vector<ui::detail::StaffingTableInfo> StaffingTableRepositoryImpl::Get() co
 
     for (auto& [staffing_table_id, job_title_id, department_id, time_job, salary] : resp) {
         ui::detail::StaffingTableInfo staffing_table{staffing_table_id, job_titles.GetJobTitle(job_title_id),
-                                                     deps.GetDep(department_id), salary, time_job};
+                                                     deps.GetDep(department_id), time_job, salary};
         result.push_back(staffing_table);
     }
 
@@ -287,7 +287,7 @@ std::vector<ui::detail::TimeSheetInfo> TimeSheetRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM ТабельУчетаРабочегоВремени;"s;
+    std::string query = "SELECT * FROM ТабельУчетаРабочегоВремени ORDER BY НомерЗаписи;"s;
 
     auto resp = tr.query<int, int, int, std::string>(query);
 
@@ -316,7 +316,7 @@ std::vector<ui::detail::VacationInfo> VacationRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
-    std::string query = "SELECT * FROM Отпуск;"s;
+    std::string query = "SELECT * FROM Отпуск ORDER BY НомерЗаписи;"s;
 
     auto resp = tr.query<int, int, std::string, std::string, std::string, int, std::string>(query);
 
@@ -368,20 +368,14 @@ void WorkerImpl::AddBusinessTrip(const domain::BusinessTrip& trip) {
         trip.GetFromDate(), trip.GetToDate(), trip.GetDays(), trip.GetTarget());
 }
 
-void WorkerImpl::DeleteBusinessTrip(const domain::BusinessTrip& trip) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM Командировка WHERE НомерЗаписи=$1;
-    )"_zv,
-        trip.GetTripId());
-}
-
 void WorkerImpl::UpdateBusinessTrip(const domain::BusinessTrip& trip) {
     nontr_.exec_params(
         R"(
-    UPDATE Командировка SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
+    UPDATE Командировка SET Страна=$2, Город=$3, Организация=$4, СДата=$5, ПоДату=$6,
+                            КоличествоДней=$7, Цель=$8 WHERE НомерЗаписи=$1;
     )"_zv,
-        trip.GetTripId());
+        trip.GetTripId(), trip.GetCountry(), trip.GetCity(), trip.GetOrganization(),
+        trip.GetFromDate(), trip.GetToDate(), trip.GetDays(), trip.GetTarget());
 }
 
 void WorkerImpl::AddCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) {
@@ -393,20 +387,12 @@ void WorkerImpl::AddCompositionBusinessTrip(const domain::CompositionBusinessTri
         trip.GetPersonnelNumber(), trip.GetTripId());
 }
 
-void WorkerImpl::DeleteCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM СоставКомандировки WHERE НомерЗаписи=$1;
-    )"_zv,
-        trip.GetTripId());
-}
-
 void WorkerImpl::UpdateCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) {
     nontr_.exec_params(
         R"(
-    UPDATE СоставКомандировки SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
+    UPDATE СоставКомандировки SET НомерЗаписи=$2 WHERE ТабельныйНомер=$1;
     )"_zv,
-        trip.GetTripId());
+        trip.GetPersonnelNumber(), trip.GetTripId());
 }
 
 void WorkerImpl::AddDepartment(const domain::Department& dep) {
@@ -417,20 +403,12 @@ void WorkerImpl::AddDepartment(const domain::Department& dep) {
         dep.GetDepartmentId(), dep.GetManagerPersonalNum(), dep.GetDepName(), dep.GetOfficeNum());
 }
 
-void WorkerImpl::DeleteDepartment(const domain::Department& dep) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM Отдел WHERE КодОтдела=$1;
-    )"_zv,
-        dep.GetDepartmentId());
-}
-
 void WorkerImpl::UpdateDepartment(const domain::Department& dep) {
     nontr_.exec_params(
         R"(
-    UPDATE Отдел SET КодОтдела=КодОтдела + 1 WHERE КодОтдела=$1;
+    UPDATE Отдел SET ТабельныйНомерРуководителя=$2, Название=$3, НомерКабинета=$4 WHERE КодОтдела=$1;
     )"_zv,
-        dep.GetDepartmentId());
+        dep.GetDepartmentId(), dep.GetManagerPersonalNum(), dep.GetDepName(), dep.GetOfficeNum());
 }
 
 void WorkerImpl::AddEmployee(const domain::Employee& employee) {
@@ -460,20 +438,16 @@ void WorkerImpl::AddEmployee(const domain::Employee& employee) {
     }
 }
 
-void WorkerImpl::DeleteEmployee(const domain::Employee& employee) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM Сотрудник WHERE ТабельныйНомер=$1;
-    )"_zv,
-        employee.GetPersonnelNumber());
-}
-
 void WorkerImpl::UpdateEmployee(const domain::Employee& employee) {
     nontr_.exec_params(
         R"(
-    UPDATE Сотрудник SET ТабельныйНомер=ТабельныйНомер + 1 WHERE ТабельныйНомер=$1;
+    UPDATE Сотрудник SET ФИО=$2, Пол=$3, КодДолжности=$4, Стаж=$5,
+           Телефон=$6, Прописка=$7, Образование=$8, ДатаПриема=$9,
+           Почта=$10, СемейноеПоложение=$11 WHERE ТабельныйНомер=$1;
     )"_zv,
-        employee.GetPersonnelNumber());
+        employee.GetPersonnelNumber(), employee.GetFullName(), employee.GetGender(),
+        employee.GetJobTitleId(), *employee.GetExperience(), employee.GetNumber(), employee.GetRegistration(),
+        employee.GetEducation(), employee.GetDate(), employee.GetMail(), employee.GetMerialStatus());
 }
 
 void WorkerImpl::AddJobTitle(const domain::JobTitle& job_title) {
@@ -484,20 +458,12 @@ void WorkerImpl::AddJobTitle(const domain::JobTitle& job_title) {
         job_title.GetJobTitleId(), job_title.GetJobTitle());
 }
 
-void WorkerImpl::DeleteJobTitle(const domain::JobTitle& job_title) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM Должность WHERE КодДолжности=$1;
-    )"_zv,
-        job_title.GetJobTitleId());
-}
-
 void WorkerImpl::UpdateJobTitle(const domain::JobTitle& job_title) {
     nontr_.exec_params(
         R"(
-    UPDATE Должность SET КодДолжности=КодДолжности + 1 WHERE КодДолжности=$1;
+    UPDATE Должность SET Название=$2 WHERE КодДолжности=$1;
     )"_zv,
-        job_title.GetJobTitleId());
+        job_title.GetJobTitleId(), job_title.GetJobTitle());
 }
 
 void WorkerImpl::AddOrder(const domain::Order& order) {
@@ -508,20 +474,12 @@ void WorkerImpl::AddOrder(const domain::Order& order) {
         order.GetOrderId(), order.GetPersonnelNumber(), order.GetDate(), order.GetContent());
 }
 
-void WorkerImpl::DeleteOrder(const domain::Order& order) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM Приказ WHERE НомерПриказа=$1;
-    )"_zv,
-        order.GetOrderId());
-}
-
 void WorkerImpl::UpdateOrder(const domain::Order& order) {
     nontr_.exec_params(
         R"(
-    UPDATE Приказ SET НомерПриказа=НомерПриказа + 1 WHERE НомерПриказа=$1;
+    UPDATE Приказ SET ТабельныйНомер=$2, ДатаОформления=$3, Содержание=$4 WHERE НомерПриказа=$1;
     )"_zv,
-        order.GetOrderId());
+        order.GetOrderId(), order.GetPersonnelNumber(), order.GetDate(), order.GetContent());
 }
 
 void WorkerImpl::AddStaffingTable(const domain::StaffingTable& staffing_table) {
@@ -533,20 +491,13 @@ void WorkerImpl::AddStaffingTable(const domain::StaffingTable& staffing_table) {
         staffing_table.GetTimeJob(), staffing_table.GetSalary());
 }
 
-void WorkerImpl::DeleteStaffingTable(const domain::StaffingTable& staffing_table) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM ШтатноеРасписание WHERE НомерЗаписи=$1;
-    )"_zv,
-        staffing_table.GetStaffingTableId());
-}
-
 void WorkerImpl::UpdateStaffingTable(const domain::StaffingTable& staffing_table) {
     nontr_.exec_params(
         R"(
-    UPDATE ШтатноеРасписание SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
+    UPDATE ШтатноеРасписание SET КодДолжности=$2, КодОтдела=$3, КоличествоСтавок=$4, Оклад=$5 WHERE НомерЗаписи=$1;
     )"_zv,
-        staffing_table.GetStaffingTableId());
+        staffing_table.GetStaffingTableId(), staffing_table.GetJobTitleId(), staffing_table.GetDepartmentId(),
+        staffing_table.GetTimeJob(), staffing_table.GetSalary());
 }
 
 void WorkerImpl::AddTimeSheet(const domain::TimeSheet& time_sheet) {
@@ -557,20 +508,12 @@ void WorkerImpl::AddTimeSheet(const domain::TimeSheet& time_sheet) {
         time_sheet.GetTimeSheetId(), time_sheet.GetPersonnelNumber(), time_sheet.GetTimeWorked(), time_sheet.GetMonth());
 }
 
-void WorkerImpl::DeleteTimeSheet(const domain::TimeSheet& time_sheet) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM ТабельУчетаРабочегоВремени WHERE НомерЗаписи=$1;
-    )"_zv,
-        time_sheet.GetTimeSheetId());
-}
-
 void WorkerImpl::UpdateTimeSheet(const domain::TimeSheet& time_sheet) {
     nontr_.exec_params(
         R"(
-    UPDATE ТабельУчетаРабочегоВремени SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
+    UPDATE ТабельУчетаРабочегоВремени SET ТабельныйНомер=$2, ОтработанноеВремя=$3, Месяц=$4 WHERE НомерЗаписи=$1;
     )"_zv,
-        time_sheet.GetTimeSheetId());
+        time_sheet.GetTimeSheetId(), time_sheet.GetPersonnelNumber(), time_sheet.GetTimeWorked(), time_sheet.GetMonth());
 }
 
 void WorkerImpl::AddVacation(const domain::Vacation& vacation) {
@@ -584,20 +527,14 @@ void WorkerImpl::AddVacation(const domain::Vacation& vacation) {
         vacation.GetFromDate(), vacation.GetToDate(), vacation.GetDays(), vacation.GetLeaveBasis());
 }
 
-void WorkerImpl::DeleteVacation(const domain::Vacation& vacation) {
-    nontr_.exec_params(
-        R"(
-    DELETE FROM Отпуск WHERE НомерЗаписи=$1;
-    )"_zv,
-        vacation.GetVacationId());
-}
-
 void WorkerImpl::UpdateVacation(const domain::Vacation& vacation) {
     nontr_.exec_params(
         R"(
-    UPDATE Отпуск SET НомерЗаписи=НомерЗаписи + 1 WHERE НомерЗаписи=$1;
+    UPDATE Отпуск SET ТабельныйНомер=$2, ВидОтпуска=$3, ДатаОтпуска=$4,
+                      ДатаОкончания=$5, КоличествоДней=$6, Основание=$7 WHERE НомерЗаписи=$1;
     )"_zv,
-        vacation.GetVacationId());
+        vacation.GetVacationId(), vacation.GetPersonnelNumber(), vacation.GetType(),
+        vacation.GetFromDate(), vacation.GetToDate(), vacation.GetDays(), vacation.GetLeaveBasis());
 }
 
 WorkerImpl::~WorkerImpl() = default;

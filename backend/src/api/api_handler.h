@@ -85,31 +85,17 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     void HandleAddTimeSheet();
     void HandleAddVacation();
 
-    /*
+
     void HandleUpdate();
-    void HandleUpdateBusinessTrips();
-    void HandleUpdateCompositionBusinessTrips();
-    void HandleUpdateDepartments();
-    void HandleUpdateEmployees();
-    void HandleUpdateJobTitles();
-    void HandleUpdateOrders();
+    void HandleUpdateBusinessTrip();
+    void HandleUpdateCompositionBusinessTrip();
+    void HandleUpdateDepartment();
+    void HandleUpdateEmployee();
+    void HandleUpdateJobTitle();
+    void HandleUpdateOrder();
     void HandleUpdateStaffingTable();
     void HandleUpdateTimeSheet();
-    void HandleUpdateVacations();
-    */
-
-    /*
-    void HandleDelete();
-    void HandleDeleteBusinessTrips();
-    void HandleDeleteCompositionBusinessTrips();
-    void HandleDeleteDepartments();
-    void HandleDeleteEmployees();
-    void HandleDeleteJobTitles();
-    void HandleDeleteOrders();
-    void HandleDeleteStaffingTable();
-    void HandleDeleteTimeSheet();
-    void HandleDeleteVacations();
-    */
+    void HandleUpdateVacation();
 
     template <typename Body, typename Allocator>
     RequestInfo ParseRequest(const http::request<Body, http::basic_fields<Allocator>>& req);

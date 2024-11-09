@@ -17,39 +17,30 @@ class WorkerImpl : public domain::Worker {
     explicit WorkerImpl(pqxx::connection& conn);
 
     void AddBusinessTrip(const domain::BusinessTrip& trip) override;
-    void DeleteBusinessTrip(const domain::BusinessTrip& trip) override;
     void UpdateBusinessTrip(const domain::BusinessTrip& trip) override;
 
     void AddCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) override;
-    void DeleteCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) override;
     void UpdateCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) override;
 
     void AddDepartment(const domain::Department& dep) override;
-    void DeleteDepartment(const domain::Department& dep) override;
     void UpdateDepartment(const domain::Department& dep) override;
 
     void AddEmployee(const domain::Employee& employee) override;
-    void DeleteEmployee(const domain::Employee& employee) override;
     void UpdateEmployee(const domain::Employee& employee) override;
 
     void AddJobTitle(const domain::JobTitle& job_title) override;
-    void DeleteJobTitle(const domain::JobTitle& job_title) override;
     void UpdateJobTitle(const domain::JobTitle& job_title) override;
 
     void AddOrder(const domain::Order& order) override;
-    void DeleteOrder(const domain::Order& order) override;
     void UpdateOrder(const domain::Order& order) override;
 
     void AddStaffingTable(const domain::StaffingTable& staffing_table) override;
-    void DeleteStaffingTable(const domain::StaffingTable& staffing_table) override;
     void UpdateStaffingTable(const domain::StaffingTable& staffing_table) override;
 
     void AddTimeSheet(const domain::TimeSheet& time_sheet) override;
-    void DeleteTimeSheet(const domain::TimeSheet& time_sheet) override;
     void UpdateTimeSheet(const domain::TimeSheet& time_sheet) override;
 
     void AddVacation(const domain::Vacation& vacation) override;
-    void DeleteVacation(const domain::Vacation& vacation) override;
     void UpdateVacation(const domain::Vacation& vacation) override;
 
     ~WorkerImpl() override;
