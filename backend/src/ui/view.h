@@ -155,7 +155,12 @@ struct EmployeeInfo {
         emp.gender = employee.at("Пол").as_string();
         emp.job_title = static_cast<int>(employee.at("КодДолжности").as_int64());
         if (employee.as_object().if_contains("Стаж")) {
-            emp.experience = employee.at("Стаж").as_int64();
+            if (employee.at("Стаж").is_int64()) {
+                emp.experience = employee.at("Стаж").as_int64();
+            }
+            if (employee.at("Стаж").is_string()) {
+                emp.experience = std::stoi(employee.at("Стаж").as_string().c_str());
+            }
         }
         emp.number = employee.at("Телефон").as_string();
         emp.registration = employee.at("Прописка").as_string();

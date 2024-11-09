@@ -102,6 +102,7 @@ void ApiHandler::HandleAddBusinessTrip() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    jv.as_object()["НомерЗаписи"] = json::value(application_.GetUseCases().GetCountBusinessTrips() + 1);
 
     int days = jv.at("КоличествоДней").as_int64();
     if (days <= 0) {
@@ -117,10 +118,6 @@ void ApiHandler::HandleAddBusinessTrip() {
     }
 
     ui::detail::BusinessTripInfo trip = json::value_to<ui::detail::BusinessTripInfo>(jv);
-    if (application_.GetUseCases().GetCountBusinessTrips() + 1 !=
-trip.trip_id) {
-        return SendBadRequestResponse("Ошибка НомерЗаписи != НомерЗаписи + 1"s);
-    }
 
     try {
         if (CheckEndPath()) {
@@ -162,11 +159,9 @@ void ApiHandler::HandleAddDepartment() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    jv.as_object()["КодОтдела"] = json::value(application_.GetUseCases().GetCountDepartments() + 1);
 
     ui::detail::DepartmentInfo dep = json::value_to<ui::detail::DepartmentInfo>(jv);
-    if (application_.GetUseCases().GetCountDepartments() + 1 != dep.department_id) {
-        return SendBadRequestResponse("Ошибка КодОтдела != КодОтдела + 1"s);
-    }
 
     try {
         if (CheckEndPath()) {
@@ -187,6 +182,8 @@ void ApiHandler::HandleAddEmployee() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    jv.as_object()["ТабельныйНомер"] = json::value(application_.GetUseCases().GetCountEmployees() + 1);
+
     std::string job_title;
     job_title = jv.at("КодДолжности").as_string();
     jv.as_object()["КодДолжности"] = application_.GetUseCases().GetJobTitleId(job_title);
@@ -201,9 +198,6 @@ void ApiHandler::HandleAddEmployee() {
     }
 
     ui::detail::EmployeeInfo employee = json::value_to<ui::detail::EmployeeInfo>(jv);
-    if (application_.GetUseCases().GetCountEmployees() + 1 != employee.personnel_number) {
-        return SendBadRequestResponse("Ошибка ТабельныйНомер != ТабельныйНомер + 1"s);
-    }
 
     try {
         if (CheckEndPath()) {
@@ -224,11 +218,9 @@ void ApiHandler::HandleAddJobTitle() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    jv.as_object()["КодДолжности"] = json::value(application_.GetUseCases().GetCountJobTitles() + 1);
 
     ui::detail::JobTitleInfo job_title = json::value_to<ui::detail::JobTitleInfo>(jv);
-    if (application_.GetUseCases().GetCountJobTitles() + 1 != job_title.job_title_id) {
-        return SendBadRequestResponse("Ошибка КодДолжности != КодДолжности + 1"s);
-    }
 
     try {
         if (CheckEndPath()) {
@@ -249,11 +241,9 @@ void ApiHandler::HandleAddOrder() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    jv.as_object()["НомерПриказа"] = json::value(application_.GetUseCases().GetCountOrders() + 1);
 
     ui::detail::OrderInfo order = json::value_to<ui::detail::OrderInfo>(jv);
-    if (application_.GetUseCases().GetCountOrders() + 1 != order.order_id) {
-        return SendBadRequestResponse("Ошибка НомерПриказа != НомерПриказа + 1"s);
-    }
 
     try {
         if (CheckEndPath()) {
@@ -274,6 +264,8 @@ void ApiHandler::HandleAddStaffingTable() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    jv.as_object()["НомерЗаписи"] = json::value(application_.GetUseCases().GetCountStaffingTable() + 1);
+
     std::string job_title;
     job_title = jv.at("КодДолжности").as_string();
     jv.as_object()["КодДолжности"] = application_.GetUseCases().GetJobTitleId(job_title);
@@ -299,9 +291,6 @@ void ApiHandler::HandleAddStaffingTable() {
     }
 
     ui::detail::StaffingTableInfo staffing_table = json::value_to<ui::detail::StaffingTableInfo>(jv);
-    if (application_.GetUseCases().GetCountStaffingTable() + 1 != staffing_table.staffing_table_id) {
-        return SendBadRequestResponse("Ошибка НомерЗаписи != НомерЗаписи + 1"s);
-    }
 
     try {
         if (CheckEndPath()) {
@@ -322,6 +311,7 @@ void ApiHandler::HandleAddTimeSheet() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    jv.as_object()["НомерЗаписи"] = json::value(application_.GetUseCases().GetCountTimeSheet() + 1);
 
     int time_worked = jv.at("ОтработанноеВремя").as_int64();
     if (time_worked <= 0) {
@@ -337,9 +327,6 @@ month == "декабрь")) {
     }
 
     ui::detail::TimeSheetInfo time_sheet = json::value_to<ui::detail::TimeSheetInfo>(jv);
-    if (application_.GetUseCases().GetCountTimeSheet() + 1 != time_sheet.time_sheet_id) {
-        return SendBadRequestResponse("Ошибка НомерЗаписи != НомерЗаписи + 1"s);
-    }
 
     try {
         if (CheckEndPath()) {
@@ -360,6 +347,7 @@ void ApiHandler::HandleAddVacation() {
     }
 
     json::value jv = json::parse(req_info_.body);
+    jv.as_object()["НомерЗаписи"] = json::value(application_.GetUseCases().GetCountVacations() + 1);
 
     int days = jv.at("КоличествоДней").as_int64();
     if (days <= 0) {
@@ -375,14 +363,11 @@ void ApiHandler::HandleAddVacation() {
     }
 
     ui::detail::VacationInfo vacation = json::value_to<ui::detail::VacationInfo>(jv);
-    if (application_.GetUseCases().GetCountVacations() + 1 != vacation.vacation_id) {
-        return SendBadRequestResponse("Ошибка НомерЗаписи != НомерЗаписи + 1"s);
-    }
 
     try {
         if (CheckEndPath()) {
             application_.GetUseCases().AddVacation(vacation);
-            SendOkResponse({});
+            return SendOkResponse({});
         }
     }
     catch (const std::exception& e) {
@@ -606,6 +591,7 @@ void ApiHandler::HandleUpdateCompositionBusinessTrip() {
 
     json::value jv = json::parse(req_info_.body);
     ui::detail::CompositionBusinessTripInfo trip = json::value_to<ui::detail::CompositionBusinessTripInfo>(jv);
+
     if (application_.GetUseCases().GetCountBusinessTrips() < trip.trip_id) {
         return SendBadRequestResponse("Ошибка НомерЗаписи не найден"s);
     }
