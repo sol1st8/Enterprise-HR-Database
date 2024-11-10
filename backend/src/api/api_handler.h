@@ -6,14 +6,17 @@
 #include "../resp_maker.h"
 
 #include <boost/beast.hpp>
+#include <deque>
 #include <boost/json.hpp>
 #include <functional>
 #include <memory>
 #include <optional>
+#include <unordered_set>
 #include <string_view>
 #include <string>
 
 namespace api_handler {
+namespace net = boost::asio;
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace json = boost::json;
@@ -36,6 +39,49 @@ db::AppConfig GetConfigFromEnv() {
 
 }  // namespace
 
+class TimeTracker {
+private:
+  std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
+
+public:
+  TimeTracker() : start_time_(std::chrono::high_resolution_clock::now()) {}
+
+  bool Has20MinutesPassed() {
+    auto current_time = std::chrono::high_resolution_clock::now();
+    auto elapsed_time = std::chrono::duration_cast<std::chrono::minutes>(current_time - start_time_);
+    return elapsed_time >= std::chrono::minutes(20);
+  }
+
+  void reset_timer() {
+    start_time_ = std::chrono::high_resolution_clock::now();
+  }
+};
+
+struct Person {
+    std::string email;
+    std::string password;
+    std::string role;
+
+    auto operator<=>(const Person&) const = default;
+};
+
+struct PersonInfo {
+    std::string email;
+    std::string password;
+    std::string name;
+    std::string role;
+
+    auto operator<=>(const PersonInfo&) const = default;
+};
+
+struct Tokens {
+    std::string access_token;
+    std::string refresh_token;
+    TimeTracker tracker;
+
+    auto operator<=>(const Tokens&) const = default;
+};
+
 struct RequestInfo {
     std::string target;
     std::string body;
@@ -43,6 +89,7 @@ struct RequestInfo {
     std::string content_type;
     int version;
     bool keep_alive;
+    std::string auth;
 };
 
 class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
@@ -58,6 +105,24 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     std::function<void(ResponseInfo)> send_;
     RequestInfo req_info_{};
     db::Application application_{GetConfigFromEnv()};
+
+    std::random_device random_device_;
+    std::mt19937_64 generator1_{[this] {
+        std::uniform_int_distribution<std::mt19937_64::result_type> dist;
+        return dist(random_device_);
+    }()};
+    std::mt19937_64 generator2_{[this] {
+        std::uniform_int_distribution<std::mt19937_64::result_type> dist;
+        return dist(random_device_);
+    }()};
+
+    std::string GetUniqueToken() {
+        std::stringstream stream;
+        stream.fill('0');
+        stream << std::hex << std::setw(16) << generator1_();
+        stream << std::hex << std::setw(16) << generator2_();
+        return stream.str();
+    }
 
     bool CheckEndPath();
     std::string FindAndCutTarget(RequestInfo& req);
@@ -85,7 +150,6 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     void HandleAddTimeSheet();
     void HandleAddVacation();
 
-
     void HandleUpdate();
     void HandleUpdateBusinessTrip();
     void HandleUpdateCompositionBusinessTrip();
@@ -96,6 +160,12 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     void HandleUpdateStaffingTable();
     void HandleUpdateTimeSheet();
     void HandleUpdateVacation();
+
+    void HandleRegister();
+    void HandleLogin();
+    void HandleLogout();
+    void HandleToken();
+    void HandleUser();
 
     template <typename Body, typename Allocator>
     RequestInfo ParseRequest(const http::request<Body, http::basic_fields<Allocator>>& req);
@@ -110,6 +180,9 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     }
     void SendNotFoundResponse(const std::string& message =  "Table not found"s,
                               const std::string& key = "tableNotFound"s, bool no_cache = true);
+
+    void SendNoAuthResponse(const std::string& message = "invalidToken"s,
+                            const std::string& key = "Something wrong with token"s, bool no_cache = true);
 
     void SendWrongMethodResponseAllowedDelete(const std::string& message = "Only DELETE method is expected"s, bool no_cache = true);
     void SendWrongMethodResponseAllowedGetHead (const std::string& message = "Only GET/HEAD method is expected"s,
@@ -137,6 +210,9 @@ RequestInfo ApiHandler::ParseRequest(const http::request<Body, http::basic_field
 
     if (req.find(http::field::content_type) != req.end()) {
         result.content_type = req.at(http::field::content_type);
+    }
+    if (req.find(http::field::authorization) != req.end()) {
+        result.auth = req.at(http::field::authorization).substr(7);
     }
 
     return result;
