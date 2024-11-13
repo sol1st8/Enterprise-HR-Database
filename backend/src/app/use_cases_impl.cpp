@@ -70,7 +70,7 @@ void UseCasesImpl::AddEmployee(const ui::detail::EmployeeInfo& employee) {
     worker->AddEmployee({employee.personnel_number, employee.full_name, employee.gender,
                          std::get<int>(employee.job_title), employee.experience, employee.number,
                          employee.registration, employee.education, employee.date,
-                         employee.mail, employee.marital_status});
+                         employee.mail, employee.marital_status, employee.date_of_dismissal});
 }
 
 void UseCasesImpl::UpdateEmployee(const ui::detail::EmployeeInfo& employee) {
@@ -78,7 +78,7 @@ void UseCasesImpl::UpdateEmployee(const ui::detail::EmployeeInfo& employee) {
     worker->UpdateEmployee({employee.personnel_number, employee.full_name, employee.gender,
                             std::get<int>(employee.job_title), employee.experience, employee.number,
                             employee.registration, employee.education, employee.date,
-                            employee.mail, employee.marital_status});
+                            employee.mail, employee.marital_status, employee.date_of_dismissal});
 }
 
 std::vector<ui::detail::EmployeeInfo> UseCasesImpl::GetEmployees() const {
@@ -170,6 +170,8 @@ int UseCasesImpl::GetCountVacations() const { return vacations_.GetCount(); }
 
 std::string UseCasesImpl::GetDepartment(int id) const { return deps_.GetDep(id); }
 int UseCasesImpl::GetDepartmentId(const std::string& dep) const { return deps_.GetDepId(dep); }
+
+std::unordered_set<std::string> UseCasesImpl::GetEmails() const { return employees_.GetEmails(); }
 
 std::string UseCasesImpl::GetJobTitle(int id) const { return job_titles_.GetJobTitle(id); }
 int UseCasesImpl::GetJobTitleId(const std::string& job_title) const { return job_titles_.GetJobTitleId(job_title); }

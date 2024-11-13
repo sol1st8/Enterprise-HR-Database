@@ -115,6 +115,8 @@ class EmployeeRepositoryImpl : public domain::EmployeeRepository {
 
     int GetCount() const override;
 
+    std::unordered_set<std::string> GetEmails() const override;
+
   private:
     connection_pool::ConnectionPool& pool_;
 };

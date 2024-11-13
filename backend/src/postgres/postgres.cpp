@@ -21,7 +21,7 @@ std::vector<ui::detail::BusinessTripInfo> BusinessTripRepositoryImpl::Get() cons
 
     std::vector<ui::detail::BusinessTripInfo> result;
 
-    for (auto& [trip_id, country, city, organization, from_date, to_date, days, target] : resp) {
+    for (const auto& [trip_id, country, city, organization, from_date, to_date, days, target] : resp) {
         ui::detail::BusinessTripInfo trip{trip_id, country, city, organization,
                                           from_date, to_date, days, target};
         result.push_back(trip);
@@ -51,7 +51,7 @@ std::vector<ui::detail::CompositionBusinessTripInfo> CompositionBusinessTripRepo
 
     std::vector<ui::detail::CompositionBusinessTripInfo> result;
 
-    for (auto& [personnel_number, trip_id] : resp) {
+    for (const auto& [personnel_number, trip_id] : resp) {
         ui::detail::CompositionBusinessTripInfo trip{personnel_number, trip_id};
         result.push_back(trip);
     }
@@ -67,7 +67,7 @@ std::string DepartmentRepositoryImpl::GetDep(int id) const {
 
     auto resp = tr.query<int, int, std::string, int>(query);
 
-    for (auto& [dep_id, manager_personnel_num, dep_name, office_num] : resp) {
+    for (const auto& [dep_id, manager_personnel_num, dep_name, office_num] : resp) {
         if (dep_id == id) {
             return dep_name;
         }
@@ -84,7 +84,7 @@ int DepartmentRepositoryImpl::GetDepId(const std::string& dep) const {
 
     auto resp = tr.query<int, int, std::string, int>(query);
 
-    for (auto& [dep_id, manager_personnel_num, dep_name, office_num] : resp) {
+    for (const auto& [dep_id, manager_personnel_num, dep_name, office_num] : resp) {
         if (dep_name == dep) {
             return dep_id;
         }
@@ -103,7 +103,7 @@ std::vector<ui::detail::DepartmentInfo> DepartmentRepositoryImpl::Get() const {
 
     std::vector<ui::detail::DepartmentInfo> result;
 
-    for (auto& [id, manager_personal_number, dep_name, office_num] : resp) {
+    for (const auto& [id, manager_personal_number, dep_name, office_num] : resp) {
         ui::detail::DepartmentInfo department{id, manager_personal_number, dep_name, office_num};
         result.push_back(department);
     }
@@ -122,6 +122,24 @@ int DepartmentRepositoryImpl::GetCount() const {
     return count;
 }
 
+std::unordered_set<std::string> EmployeeRepositoryImpl::GetEmails() const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT Почта FROM Сотрудник"s;
+
+    pqxx::result resp = tr.exec(query);
+
+    std::unordered_set<std::string> emails;
+
+    for (const auto& row : resp) {
+        std::string email = row["Почта"].as<std::string>();
+        emails.insert(email);
+    }
+
+    return emails;
+}
+
 std::vector<ui::detail::EmployeeInfo> EmployeeRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
@@ -131,16 +149,16 @@ std::vector<ui::detail::EmployeeInfo> EmployeeRepositoryImpl::Get() const {
     std::string query = "SELECT * FROM Сотрудник ORDER BY ТабельныйНомер;"s;
 
     auto resp = tr.query<int, std::string, std::string, int, std::optional<int>, std::string,
-                         std::string, std::string, std::string, std::string, std::string>(query);
+        std::string, std::string, std::string, std::string, std::string, std::optional<std::string>>(query);
 
     std::vector<ui::detail::EmployeeInfo> result;
 
-    for (auto& [personnel_number, full_name, gender, job_title_id, experience, number,
-                registration, education, date, mail, merial_status] : resp) {
+    for (const auto& [personnel_number, full_name, gender, job_title_id, experience, number,
+                registration, education, date, mail, merial_status, date_of_dismissal] : resp) {
         ui::detail::EmployeeInfo employee{personnel_number, full_name, gender,
                                           job_titles.GetJobTitle(job_title_id),
                                           experience, number, registration, education,
-                                          date, mail, merial_status};
+                                          date, mail, merial_status, date_of_dismissal};
         result.push_back(employee);
     }
 
@@ -166,7 +184,7 @@ std::string JobTitleRepositoryImpl::GetJobTitle(int id) const {
 
     auto resp = tr.query<int, std::string>(query);
 
-    for (auto& [job_title_id, job_title] : resp) {
+    for (const auto& [job_title_id, job_title] : resp) {
         if (id == job_title_id) {
             return job_title;
         }
@@ -183,7 +201,7 @@ int JobTitleRepositoryImpl::GetJobTitleId(const std::string& job_title) const {
 
     auto resp = tr.query<int, std::string>(query);
 
-    for (auto& [id, j_title] : resp) {
+    for (const auto& [id, j_title] : resp) {
         if (job_title == j_title) {
             return id;
         }
@@ -202,7 +220,7 @@ std::vector<ui::detail::JobTitleInfo> JobTitleRepositoryImpl::Get() const {
 
     std::vector<ui::detail::JobTitleInfo> result;
 
-    for (auto& [id, job_title] : resp) {
+    for (const auto& [id, job_title] : resp) {
         ui::detail::JobTitleInfo job_title_info{id, job_title};
         result.push_back(job_title_info);
     }
@@ -231,7 +249,7 @@ std::vector<ui::detail::OrderInfo> OrderRepositoryImpl::Get() const {
 
     std::vector<ui::detail::OrderInfo> result;
 
-    for (auto& [order_id, personnel_number, date, content] : resp) {
+    for (const auto& [order_id, personnel_number, date, content] : resp) {
         ui::detail::OrderInfo order{order_id, personnel_number, date, content};
         result.push_back(order);
     }
@@ -263,7 +281,7 @@ std::vector<ui::detail::StaffingTableInfo> StaffingTableRepositoryImpl::Get() co
 
     std::vector<ui::detail::StaffingTableInfo> result;
 
-    for (auto& [staffing_table_id, job_title_id, department_id, time_job, salary] : resp) {
+    for (const auto& [staffing_table_id, job_title_id, department_id, time_job, salary] : resp) {
         ui::detail::StaffingTableInfo staffing_table{staffing_table_id, job_titles.GetJobTitle(job_title_id),
                                                      deps.GetDep(department_id), time_job, salary};
         result.push_back(staffing_table);
@@ -293,7 +311,7 @@ std::vector<ui::detail::TimeSheetInfo> TimeSheetRepositoryImpl::Get() const {
 
     std::vector<ui::detail::TimeSheetInfo> result;
 
-    for (auto& [time_sheet_id, personnel_number, time_worked, month] : resp) {
+    for (const auto& [time_sheet_id, personnel_number, time_worked, month] : resp) {
         ui::detail::TimeSheetInfo time_sheet{time_sheet_id, personnel_number, time_worked, month};
         result.push_back(time_sheet);
     }
@@ -322,7 +340,7 @@ std::vector<ui::detail::VacationInfo> VacationRepositoryImpl::Get() const {
 
     std::vector<ui::detail::VacationInfo> result;
 
-    for (auto& [vacation_id, personnel_number, type, from_date, to_date, days, leave_basis] : resp) {
+    for (const auto& [vacation_id, personnel_number, type, from_date, to_date, days, leave_basis] : resp) {
         ui::detail::VacationInfo time_sheet{vacation_id, personnel_number, type, from_date,
                                             to_date, days, leave_basis};
         result.push_back(time_sheet);
@@ -443,11 +461,11 @@ void WorkerImpl::UpdateEmployee(const domain::Employee& employee) {
         R"(
     UPDATE Сотрудник SET ФИО=$2, Пол=$3, КодДолжности=$4, Стаж=$5,
            Телефон=$6, Прописка=$7, Образование=$8, ДатаПриема=$9,
-           Почта=$10, СемейноеПоложение=$11 WHERE ТабельныйНомер=$1;
+           Почта=$10, СемейноеПоложение=$11, ДатаУвольнения=$12 WHERE ТабельныйНомер=$1;
     )"_zv,
         employee.GetPersonnelNumber(), employee.GetFullName(), employee.GetGender(),
         employee.GetJobTitleId(), *employee.GetExperience(), employee.GetNumber(), employee.GetRegistration(),
-        employee.GetEducation(), employee.GetDate(), employee.GetMail(), employee.GetMerialStatus());
+        employee.GetEducation(), employee.GetDate(), employee.GetMail(), employee.GetMerialStatus(), employee.GetDateOfDismissal());
 }
 
 void WorkerImpl::AddJobTitle(const domain::JobTitle& job_title) {

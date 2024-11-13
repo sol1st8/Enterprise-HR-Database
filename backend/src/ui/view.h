@@ -127,6 +127,7 @@ struct EmployeeInfo {
     std::string date;
     std::string mail;
     std::string marital_status;
+    std::optional<std::string> date_of_dismissal;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::EmployeeInfo& employee) {
@@ -141,7 +142,8 @@ struct EmployeeInfo {
             {"Образование"s, employee.education},
             {"ДатаПриема"s, employee.date},
             {"Почта"s, employee.mail},
-            {"СемейноеПоложение"s, employee.marital_status}
+            {"СемейноеПоложение"s, employee.marital_status},
+            {"ДатаУвольнения"s, employee.date_of_dismissal ? *employee.date_of_dismissal : "NULL"s}
         };
     }
 
@@ -161,6 +163,9 @@ struct EmployeeInfo {
             if (employee.at("Стаж").is_string()) {
                 emp.experience = std::stoi(employee.at("Стаж").as_string().c_str());
             }
+        }
+        if (employee.as_object().if_contains("ДатаУвольнения")) {
+            emp.date_of_dismissal = employee.at("ДатаУвольнения").as_string();
         }
         emp.number = employee.at("Телефон").as_string();
         emp.registration = employee.at("Прописка").as_string();

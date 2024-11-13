@@ -1,7 +1,6 @@
 #include "api_handler.h"
 
 #include <algorithm>
-#include <string>
 
 namespace {
 
@@ -22,13 +21,6 @@ std::string CleanErrorMessage(const std::string& message) {
 } // namespace
 
 namespace api_handler {
-
-
-std::map<Person, std::string> persons_;
-std::map<PersonInfo, Tokens> tokens_;
-std::map<std::string, PersonInfo> auth_to_person_;
-std::map<std::string, PersonInfo> refresh_token_to_person_;
-std::deque<std::string> refresh_tokens_;
 
 bool ApiHandler::CheckEndPath() {
     return req_info_.target == "/"sv || req_info_.target.empty();
@@ -878,19 +870,24 @@ void ApiHandler::HandleRegister() {
 
     json::value person = json::parse(req_info_.body);
 
-    if (!person.as_object().contains("email"s) || !person.as_object().contains("password") || !person.as_object().contains("name") || !person.as_object().contains("role")) {
-        return SendBadRequestResponse("Invalid register format"s, "invalidArgument"s);
+    if (!person.as_object().contains("email"s) || !person.as_object().contains("password"s) || !person.as_object().contains("name"s)) {
+        return SendBadRequestResponse("Invalid register format"s, "invalidRegister"s);
     }
 
     std::string email;
     std::string password;
     std::string name;
-    std::string role;
+    std::string role = "employee"s;
 
     email = person.at("email").as_string();
     password = person.at("password").as_string();
     name = person.at("name").as_string();
-    role = person.at("role").as_string();
+
+    std::unordered_set<std::string> emails = application_.GetUseCases().GetEmails();
+
+    if (!emails.contains(email)) {
+        return SendBadRequestResponse("Сотрудник не найден"s);
+    }
 
     std::string access_token = GetUniqueToken();
     std::string refresh_token = GetUniqueToken();
@@ -909,7 +906,7 @@ void ApiHandler::HandleRegister() {
                 {"name"s, name},
                 {"role"s, role}
             }},
-        {"accessToken"s, "Bearer " + access_token},
+        {"accessToken"s, "Bearer "s + access_token},
         {"refreshToken"s, refresh_token}
     };
 
@@ -919,6 +916,21 @@ void ApiHandler::HandleRegister() {
     SendOkResponse(json::serialize(jv));
 }
 
+void ApiHandler::CreateAdmin() {
+    Person admin{"admin@work.com"s, "Admin1Admin"s, "admin"s};
+    persons_.insert({admin, "Admin"s});
+
+    PersonInfo p_info{admin.email, admin.password, persons_[admin], admin.role};
+
+    std::string access_token = GetUniqueToken();
+    std::string refresh_token = GetUniqueToken();
+
+    tokens_[p_info] = {access_token, refresh_token, TimeTracker{}};
+    auth_to_person_[access_token] = p_info;
+    refresh_tokens_.push_back(refresh_token);
+    refresh_token_to_person_[refresh_token] = p_info;
+}
+
 void ApiHandler::HandleLogin() {
     if (req_info_.method != http::verb::post) {
         return SendWrongMethodResponseAllowedPost("Wrong method"s, true);
@@ -926,17 +938,32 @@ void ApiHandler::HandleLogin() {
 
     json::value person = json::parse(req_info_.body);
 
-    if (!person.as_object().contains("email") || !person.as_object().contains("password") || !person.as_object().contains("role")) {
+    if (!person.as_object().contains("email"s) || !person.as_object().contains("password"s)) {
         return SendNoAuthResponse("Invalid login format"s, "invalidLogin"s);
+    }
+
+    if (person.at("email").as_string() == "admin@work.com"s && person.at("password").as_string() == "Admin1Admin"s) {
+        CreateAdmin();
+        PersonInfo p_info{"admin@work.com"s, "Admin1Admin"s, "Admin"s, "admin"s};
+        json::value jv {
+            {"success"s, true},
+            {"accessToken"s, "Bearer "s + tokens_[p_info].access_token},
+            {"refreshToken"s, tokens_[p_info].refresh_token},
+            {"user"s, {
+                    {"email"s, p_info.email},
+                    {"name"s, p_info.name},
+                    {"role"s, p_info.role}
+                }}
+        };
+        return SendOkResponse(json::serialize(jv));
     }
 
     std::string email;
     std::string password;
-    std::string role;
+    std::string role = "employee"s;
 
     email = person.at("email").as_string();
     password = person.at("password").as_string();
-    role = person.at("role").as_string();
     Person p{email, password, role};
 
     if (persons_.contains(p)) {
@@ -947,9 +974,9 @@ void ApiHandler::HandleLogin() {
                 {"accessToken"s, "Bearer "s + tokens_[p_info].access_token},
                 {"refreshToken"s, tokens_[p_info].refresh_token},
                 {"user"s, {
-                        {"email", p_info.email},
-                        {"name", p_info.name},
-                        {"role", p_info.role}
+                        {"email"s, p_info.email},
+                        {"name"s, p_info.name},
+                        {"role"s, p_info.role}
                     }}
             };
             return SendOkResponse(json::serialize(jv));
@@ -958,7 +985,7 @@ void ApiHandler::HandleLogin() {
             return SendBadRequestResponse("Token is expired"s, "tokenIsExpired"s);
         }
     }
-    SendNoAuthResponse("Invalid login format"s, "invalidRegister"s);
+    SendNoAuthResponse("Invalid login format"s, "invalidLogin"s);
 }
 
 void ApiHandler::HandleLogout() {
@@ -978,10 +1005,11 @@ void ApiHandler::HandleLogout() {
     if (refresh_tokens_.empty()) {
         return SendBadRequestResponse("Invalid token"s, "invalidToken"s);
     }
+
     if (refresh_tokens_.back() == tok) {
         json::value jv {
             {"success"s, true},
-            {"message"s, "Successful logout"}
+            {"message"s, "Successful logout"s}
         };
         return SendOkResponse(json::serialize(jv));
     }
@@ -1032,29 +1060,44 @@ void ApiHandler::HandleToken() {
     SendBadRequestResponseDefault();
 }
 
+void ApiHandler::HandleOptions() {
+    ResponseInfo result = MakeResponse(http::status::ok, true);
+    SendOkResponse({});
+}
+
 void ApiHandler::HandleUser() {
-    if (req_info_.method != http::verb::get) {
+    static size_t token_size = 32;
+
+    if (req_info_.method != http::verb::get && req_info_.method != http::verb::head && req_info_.method != http::verb::options) {
         return SendWrongMethodResponseAllowedGetHead("Wrong method"s, true);
     }
 
-    if (req_info_.auth.empty()) {
-        return SendBadRequestResponse("Invalid token"s, "invalidToken"s);
+    if (req_info_.method == http::verb::options) {
+        return HandleOptions();
     }
 
+    if (req_info_.auth.empty()) {
+        return SendNoAuthResponse("Invalid token"s, "invalidToken"s);
+    }
+
+    std::string token_str{req_info_.auth};
+
     try {
-        std::string email = auth_to_person_.at(req_info_.auth).email;
-        std::string name = auth_to_person_.at(req_info_.auth).name;
+        std::string email = auth_to_person_.at(token_str.substr(7)).email;
+        std::string name = auth_to_person_.at(token_str.substr(7)).name;
+        std::string role = auth_to_person_.at(token_str.substr(7)).role;
 
         json::value jv = {
             {"success"s, true},
             {"user"s, {
                     {"email"s, email},
-                    {"name"s, name}
+                    {"name"s, name},
+                    {"role"s, role}
                 }}
         };
 
         return SendOkResponse(json::serialize(jv));
-    }
+     }
     catch (...) {
         return SendBadRequestResponse("Invalid token"s, "invalidToken"s);
     }

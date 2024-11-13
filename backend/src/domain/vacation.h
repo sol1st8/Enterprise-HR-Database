@@ -3,8 +3,6 @@
 #include "../ui/view.h"
 
 #include <memory>
-#include <string>
-#include <vector>
 
 namespace domain {
 

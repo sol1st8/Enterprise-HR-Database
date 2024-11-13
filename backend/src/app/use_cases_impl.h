@@ -73,6 +73,8 @@ class UseCasesImpl : public UseCases {
     std::string GetDepartment(int id) const override;
     int GetDepartmentId(const std::string& dep) const override;
 
+    std::unordered_set<std::string> GetEmails() const override;
+
     std::string GetJobTitle(int id) const override;
     int GetJobTitleId(const std::string& job_title) const override;
 

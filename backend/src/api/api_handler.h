@@ -5,15 +5,7 @@
 #include "../application.h"
 #include "../resp_maker.h"
 
-#include <boost/beast.hpp>
 #include <deque>
-#include <boost/json.hpp>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <unordered_set>
-#include <string_view>
-#include <string>
 
 namespace api_handler {
 namespace net = boost::asio;
@@ -40,21 +32,21 @@ db::AppConfig GetConfigFromEnv() {
 }  // namespace
 
 class TimeTracker {
-private:
-  std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
+  public:
+    TimeTracker() : start_time_(std::chrono::high_resolution_clock::now()) {}
 
-public:
-  TimeTracker() : start_time_(std::chrono::high_resolution_clock::now()) {}
+    bool Has20MinutesPassed() {
+        auto current_time = std::chrono::high_resolution_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::minutes>(current_time - start_time_);
+        return elapsed_time >= std::chrono::minutes(20);
+    }
 
-  bool Has20MinutesPassed() {
-    auto current_time = std::chrono::high_resolution_clock::now();
-    auto elapsed_time = std::chrono::duration_cast<std::chrono::minutes>(current_time - start_time_);
-    return elapsed_time >= std::chrono::minutes(20);
-  }
+    void reset_timer() {
+        start_time_ = std::chrono::high_resolution_clock::now();
+    }
 
-  void reset_timer() {
-    start_time_ = std::chrono::high_resolution_clock::now();
-  }
+  private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
 };
 
 struct Person {
@@ -62,7 +54,21 @@ struct Person {
     std::string password;
     std::string role;
 
-    auto operator<=>(const Person&) const = default;
+    bool operator==(const Person& other) const {
+        return email == other.email &&
+               password == other.password &&
+               role == other.role;
+    }
+};
+
+struct PersonHasher {
+    std::size_t operator()(const Person& person) const {
+        std::size_t h1 = std::hash<std::string>()(person.email);
+        std::size_t h2 = std::hash<std::string>()(person.password);
+        std::size_t h3 = std::hash<std::string>()(person.role);
+
+        return h1 + h2 * 19 + h3 * 19 * 19;
+    }
 };
 
 struct PersonInfo {
@@ -71,15 +77,29 @@ struct PersonInfo {
     std::string name;
     std::string role;
 
-    auto operator<=>(const PersonInfo&) const = default;
+    bool operator==(const PersonInfo& other) const {
+        return email == other.email &&
+               password == other.password &&
+               name == other.name &&
+               role == other.role;
+    }
+};
+
+struct PersonInfoHasher {
+    std::size_t operator()(const PersonInfo& person) const {
+        std::size_t h1 = std::hash<std::string>()(person.email);
+        std::size_t h2 = std::hash<std::string>()(person.password);
+        std::size_t h3 = std::hash<std::string>()(person.name);
+        std::size_t h4 = std::hash<std::string>()(person.role);
+
+        return h1 + h2 * 37 + h3 * 37 * 37 + h4 * 37 * 37 * 37;
+    }
 };
 
 struct Tokens {
     std::string access_token;
     std::string refresh_token;
     TimeTracker tracker;
-
-    auto operator<=>(const Tokens&) const = default;
 };
 
 struct RequestInfo {
@@ -91,6 +111,12 @@ struct RequestInfo {
     bool keep_alive;
     std::string auth;
 };
+
+inline std::unordered_map<Person, std::string, PersonHasher> persons_;
+inline std::unordered_map<PersonInfo, Tokens, PersonInfoHasher> tokens_;
+inline std::unordered_map<std::string, PersonInfo> auth_to_person_;
+inline std::unordered_map<std::string, PersonInfo> refresh_token_to_person_;
+inline std::deque<std::string> refresh_tokens_;
 
 class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
   public:
@@ -162,9 +188,11 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     void HandleUpdateVacation();
 
     void HandleRegister();
+    void CreateAdmin();
     void HandleLogin();
     void HandleLogout();
     void HandleToken();
+    void HandleOptions();
     void HandleUser();
 
     template <typename Body, typename Allocator>
@@ -196,6 +224,7 @@ void ApiHandler::Handle(const http::request<Body, http::basic_fields<Allocator>>
     send_ = std::forward<Send>(send);
     req_info_ = ParseRequest(req);
     req_info_.target = req_info_.target.substr("/api"s.size());
+
     HandleApiResponse();
 }
 
@@ -212,7 +241,7 @@ RequestInfo ApiHandler::ParseRequest(const http::request<Body, http::basic_field
         result.content_type = req.at(http::field::content_type);
     }
     if (req.find(http::field::authorization) != req.end()) {
-        result.auth = req.at(http::field::authorization).substr(7);
+        result.auth = req.at(http::field::authorization);
     }
 
     return result;

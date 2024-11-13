@@ -3,6 +3,7 @@
 #include "../ui/view.h"
 
 #include <memory>
+#include <unordered_set>
 
 namespace domain {
 
@@ -13,17 +14,18 @@ class Employee {
     Employee(int personnel_number, std::string full_name, std::string gender,
              int job_title_id, std::optional<int> experience, std::string number,
              std::string registration, std::string education, std::string date,
-             std::string mail, std::string marital_status) : personnel_number_(personnel_number)
-                                                           , full_name_(std::move(full_name))
-                                                           , gender_(std::move(gender))
-                                                           , job_title_id_(job_title_id)
-                                                           , experience_(experience)
-                                                           , number_(std::move(number))
-                                                           , registration_(std::move(registration))
-                                                           , education_(std::move(education))
-                                                           , date_(std::move(date))
-                                                           , mail_(std::move(mail))
-                                                           , marital_status_(std::move(marital_status)) {}
+             std::string mail, std::string marital_status, std::optional<std::string> date_of_dismissal) : personnel_number_(personnel_number)
+                                                                                                         , full_name_(std::move(full_name))
+                                                                                                         , gender_(std::move(gender))
+                                                                                                         , job_title_id_(job_title_id)
+                                                                                                         , experience_(experience)
+                                                                                                         , number_(std::move(number))
+                                                                                                         , registration_(std::move(registration))
+                                                                                                         , education_(std::move(education))
+                                                                                                         , date_(std::move(date))
+                                                                                                         , mail_(std::move(mail))
+                                                                                                         , marital_status_(std::move(marital_status))
+                                                                                                         , date_of_dismissal_(std::move(date_of_dismissal)) {}
 
     int GetPersonnelNumber() const noexcept {
         return personnel_number_;
@@ -69,6 +71,10 @@ class Employee {
         return marital_status_;
     }
 
+    const std::optional<std::string>& GetDateOfDismissal() const noexcept {
+        return date_of_dismissal_;
+    }
+
   private:
     int personnel_number_;
     std::string full_name_;
@@ -81,6 +87,7 @@ class Employee {
     std::string date_;
     std::string mail_;
     std::string marital_status_;
+    std::optional<std::string> date_of_dismissal_;
 };
 
 class EmployeeRepository {
@@ -90,6 +97,8 @@ class EmployeeRepository {
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 
     virtual int GetCount() const = 0;
+
+    virtual std::unordered_set<std::string> GetEmails() const = 0;
 
   protected:
     ~EmployeeRepository() = default;
