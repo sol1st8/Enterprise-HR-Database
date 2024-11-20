@@ -42,6 +42,7 @@ class TimeSheet {
 class TimeSheetRepository {
   public:
     virtual std::vector<ui::detail::TimeSheetInfo> Get() const = 0;
+    virtual std::vector<ui::detail::TimeSheetInfo> GetForPerson(int personnel_number) const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 

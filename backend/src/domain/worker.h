@@ -19,6 +19,7 @@ class Worker {
     virtual void UpdateBusinessTrip(const domain::BusinessTrip& trip) = 0;
 
     virtual void AddCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) = 0;
+    virtual void DeleteCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) = 0;
     virtual void UpdateCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) = 0;
 
     virtual void AddDepartment(const domain::Department& dep) = 0;

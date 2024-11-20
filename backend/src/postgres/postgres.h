@@ -20,6 +20,7 @@ class WorkerImpl : public domain::Worker {
     void UpdateBusinessTrip(const domain::BusinessTrip& trip) override;
 
     void AddCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) override;
+    void DeleteCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) override;
     void UpdateCompositionBusinessTrip(const domain::CompositionBusinessTrip& trip) override;
 
     void AddDepartment(const domain::Department& dep) override;
@@ -55,6 +56,7 @@ class BusinessTripRepositoryImpl : public domain::BusinessTripRepository {
     explicit BusinessTripRepositoryImpl(connection_pool::ConnectionPool& pool) : pool_{pool} {}
 
     std::vector<ui::detail::BusinessTripInfo> Get() const override;
+    std::vector<ui::detail::BusinessTripInfo> GetForPerson(int personnel_number) const override;
 
     std::shared_ptr<domain::Worker> GetWorker() const override {
         auto conn = pool_.GetConnection();
@@ -62,6 +64,8 @@ class BusinessTripRepositoryImpl : public domain::BusinessTripRepository {
     }
 
     int GetCount() const override;
+
+    std::string GetStartDateOfBusinessTrip(int trip_id) const override;
 
   private:
     connection_pool::ConnectionPool& pool_;
@@ -72,11 +76,14 @@ class CompositionBusinessTripRepositoryImpl : public domain::CompositionBusiness
     explicit CompositionBusinessTripRepositoryImpl(connection_pool::ConnectionPool& pool) : pool_{pool} {}
 
     std::vector<ui::detail::CompositionBusinessTripInfo> Get() const override;
+    std::vector<ui::detail::CompositionBusinessTripInfo> GetForPerson(int personnel_number) const override;
 
     std::shared_ptr<domain::Worker> GetWorker() const override {
         auto conn = pool_.GetConnection();
         return std::make_shared<WorkerImpl>(*conn);
     }
+
+    std::vector<int> GetTripIds(int personnel_number) const override;
 
   private:
     connection_pool::ConnectionPool& pool_;
@@ -107,6 +114,7 @@ class EmployeeRepositoryImpl : public domain::EmployeeRepository {
     explicit EmployeeRepositoryImpl(connection_pool::ConnectionPool& pool) : pool_{pool} {}
 
     std::vector<ui::detail::EmployeeInfo> Get() const override;
+    std::vector<ui::detail::EmployeeInfo> GetForPerson(int personnel_number) const override;
 
     std::shared_ptr<domain::Worker> GetWorker() const override {
         auto conn = pool_.GetConnection();
@@ -115,7 +123,9 @@ class EmployeeRepositoryImpl : public domain::EmployeeRepository {
 
     int GetCount() const override;
 
+    std::optional<std::string> GetDateOfDismissal(int personnel_number) const override;
     std::unordered_set<std::string> GetEmails() const override;
+    int GetPersonnelNumberForEmail(const std::string& email) const override;
 
   private:
     connection_pool::ConnectionPool& pool_;
@@ -146,6 +156,7 @@ class OrderRepositoryImpl : public domain::OrderRepository {
     explicit OrderRepositoryImpl(connection_pool::ConnectionPool& pool) : pool_{pool} {}
 
     std::vector<ui::detail::OrderInfo> Get() const override;
+    std::vector<ui::detail::OrderInfo> GetForPerson(int personnel_number) const override;
 
     std::shared_ptr<domain::Worker> GetWorker() const override {
         auto conn = pool_.GetConnection();
@@ -180,6 +191,7 @@ class TimeSheetRepositoryImpl : public domain::TimeSheetRepository {
     explicit TimeSheetRepositoryImpl(connection_pool::ConnectionPool& pool) : pool_{pool} {}
 
     std::vector<ui::detail::TimeSheetInfo> Get() const override;
+    std::vector<ui::detail::TimeSheetInfo> GetForPerson(int personnel_number) const override;
 
     std::shared_ptr<domain::Worker> GetWorker() const override {
         auto conn = pool_.GetConnection();
@@ -197,6 +209,7 @@ class VacationRepositoryImpl : public domain::VacationRepository {
     explicit VacationRepositoryImpl(connection_pool::ConnectionPool& pool) : pool_{pool} {}
 
     std::vector<ui::detail::VacationInfo> Get() const override;
+    std::vector<ui::detail::VacationInfo> GetForPerson(int personnel_number) const override;
 
     std::shared_ptr<domain::Worker> GetWorker() const override {
         auto conn = pool_.GetConnection();

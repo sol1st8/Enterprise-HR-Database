@@ -42,6 +42,7 @@ class Order {
 class OrderRepository {
   public:
     virtual std::vector<ui::detail::OrderInfo> Get() const = 0;
+    virtual std::vector<ui::detail::OrderInfo> GetForPerson(int personnel_number) const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 

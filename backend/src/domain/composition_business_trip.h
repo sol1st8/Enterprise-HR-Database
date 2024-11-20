@@ -29,8 +29,11 @@ class CompositionBusinessTrip {
 class CompositionBusinessTripRepository {
   public:
     virtual std::vector<ui::detail::CompositionBusinessTripInfo> Get() const = 0;
+    virtual std::vector<ui::detail::CompositionBusinessTripInfo> GetForPerson(int personnel_number) const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
+
+    virtual std::vector<int> GetTripIds(int personnel_number) const = 0;
 
   protected:
     ~CompositionBusinessTripRepository() = default;

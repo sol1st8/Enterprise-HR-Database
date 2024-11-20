@@ -61,6 +61,7 @@ class Vacation {
 class VacationRepository {
   public:
     virtual std::vector<ui::detail::VacationInfo> Get() const = 0;
+    virtual std::vector<ui::detail::VacationInfo> GetForPerson(int personnel_number) const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 

@@ -53,8 +53,14 @@ void ApiHandler::HandleApiResponse() {
     else if (path_part == "/get"s) {
         HandleGet();
     }
+    else if (path_part == "/get-for-person"s) {
+        HandleGetForPerson();
+    }
     else if (path_part == "/update"s) {
         HandleUpdate();
+    }
+    else if (path_part == "/delete") {
+        HandleDelete();
     }
     else if (path_part == "/register"s) {
         HandleRegister();
@@ -153,6 +159,14 @@ void ApiHandler::HandleAddCompositionBusinessTrip() {
     }
 
     json::value jv = json::parse(req_info_.body);
+
+    int personnel_num = jv.at("ТабельныйНомер"s).as_int64();
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_num);
+
+    if (date_of_dismissal.has_value()) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
+    }
+
     ui::detail::CompositionBusinessTripInfo trip = json::value_to<ui::detail::CompositionBusinessTripInfo>(jv);
 
     try {
@@ -175,6 +189,13 @@ void ApiHandler::HandleAddDepartment() {
 
     json::value jv = json::parse(req_info_.body);
     jv.as_object()["КодОтдела"] = json::value(application_.GetUseCases().GetCountDepartments() + 1);
+
+    int personnel_num = jv.at("ТабельныйНомерРуководителя"s).as_int64();
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_num);
+
+    if (date_of_dismissal.has_value()) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
+    }
 
     ui::detail::DepartmentInfo dep = json::value_to<ui::detail::DepartmentInfo>(jv);
 
@@ -257,6 +278,13 @@ void ApiHandler::HandleAddOrder() {
 
     json::value jv = json::parse(req_info_.body);
     jv.as_object()["НомерПриказа"] = json::value(application_.GetUseCases().GetCountOrders() + 1);
+
+    int personnel_num = jv.at("ТабельныйНомер"s).as_int64();
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_num);
+
+    if (date_of_dismissal.has_value()) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
+    }
 
     ui::detail::OrderInfo order = json::value_to<ui::detail::OrderInfo>(jv);
 
@@ -341,6 +369,13 @@ month == "декабрь")) {
         return SendBadRequestResponse("Ошибка Месяц не существует"s);
     }
 
+    int personnel_num = jv.at("ТабельныйНомер"s).as_int64();
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_num);
+
+    if (date_of_dismissal.has_value()) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
+    }
+
     ui::detail::TimeSheetInfo time_sheet = json::value_to<ui::detail::TimeSheetInfo>(jv);
 
     try {
@@ -375,6 +410,13 @@ void ApiHandler::HandleAddVacation() {
     to_date = jv.at("ДатаОкончания").as_string();
     if (from_date >= to_date) {
         return SendBadRequestResponse("Ошибка ДатаОтпуска >= ДатаОкончания"s);
+    }
+
+    int personnel_num = jv.at("ТабельныйНомер"s).as_int64();
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_num);
+
+    if (date_of_dismissal.has_value()) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
     }
 
     ui::detail::VacationInfo vacation = json::value_to<ui::detail::VacationInfo>(jv);
@@ -526,6 +568,119 @@ void ApiHandler::HandleGetVacations() {
     SendBadRequestResponseDefault();
 }
 
+void ApiHandler::HandleGetForPerson() {
+    std::string path_part = FindAndCutTarget(req_info_);
+
+    if (path_part == "/business-trip"s) {
+        HandleGetBusinessTripsForPerson();
+    }
+    else if (path_part == "/composition-business-trip"s) {
+        HandleGetCompositionBusinessTripsForPerson();
+    }
+    else if (path_part == "/department"s) {
+        HandleGetDepartmentsForPerson();
+    }
+    else if (path_part == "/employee"s) {
+        HandleGetEmployeeForPerson();
+    }
+    else if (path_part == "/job-title"s) {
+        HandleGetJobTitlesForPerson();
+    }
+    else if (path_part == "/order"s) {
+        HandleGetOrdersForPerson();
+    }
+    else if (path_part == "/staffing-table"s) {
+        HandleGetStaffingTableForPerson();
+    }
+    else if (path_part == "/time-sheet"s) {
+        HandleGetTimeSheetForPerson();
+    }
+    else if (path_part == "/vacation"s) {
+        HandleGetVacationForPerson();
+    }
+    else {
+        SendNotFoundResponse();
+    }
+}
+
+void ApiHandler::HandleGetBusinessTripsForPerson() {
+    if (req_info_.method != http::verb::get && req_info_.method != http::verb::head) {
+        return SendWrongMethodResponseAllowedGetHead("Wrong method"s, true);
+    }
+    if (CheckEndPath()) {
+        json::value jv = json::value_from(application_.GetUseCases().GetBusinessTripsForPerson(personnel_number_));
+        return SendOkResponse(json::serialize(jv));
+    }
+    SendBadRequestResponseDefault();
+}
+
+void ApiHandler::HandleGetCompositionBusinessTripsForPerson() {
+    if (req_info_.method != http::verb::get && req_info_.method != http::verb::head) {
+        return SendWrongMethodResponseAllowedGetHead("Wrong method"s, true);
+    }
+    if (CheckEndPath()) {
+        json::value jv = json::value_from(application_.GetUseCases().GetCompositionBusinessTripsForPerson(personnel_number_));
+        return SendOkResponse(json::serialize(jv));
+    }
+    SendBadRequestResponseDefault();
+}
+
+void ApiHandler::HandleGetDepartmentsForPerson() {
+    HandleGetDepartments();
+}
+
+void ApiHandler::HandleGetEmployeeForPerson() {
+    if (req_info_.method != http::verb::get && req_info_.method != http::verb::head) {
+        return SendWrongMethodResponseAllowedGetHead("Wrong method"s, true);
+    }
+    if (CheckEndPath()) {
+        json::value jv = json::value_from(application_.GetUseCases().GetEmployeeForPerson(personnel_number_));
+        return SendOkResponse(json::serialize(jv));
+    }
+    SendBadRequestResponseDefault();
+}
+
+void ApiHandler::HandleGetJobTitlesForPerson() {
+    HandleGetJobTitles();
+}
+
+void ApiHandler::HandleGetOrdersForPerson() {
+    if (req_info_.method != http::verb::get && req_info_.method != http::verb::head) {
+        return SendWrongMethodResponseAllowedGetHead("Wrong method"s, true);
+    }
+    if (CheckEndPath()) {
+        json::value jv = json::value_from(application_.GetUseCases().GetOrdersForPerson(personnel_number_));
+        return SendOkResponse(json::serialize(jv));
+    }
+    SendBadRequestResponseDefault();
+}
+
+void ApiHandler::HandleGetStaffingTableForPerson() {
+    HandleGetStaffingTable();
+}
+
+void ApiHandler::HandleGetTimeSheetForPerson() {
+    if (req_info_.method != http::verb::get && req_info_.method != http::verb::head) {
+        return SendWrongMethodResponseAllowedGetHead("Wrong method"s, true);
+    }
+    if (CheckEndPath()) {
+        json::value jv = json::value_from(application_.GetUseCases().GetTimeSheetForPerson(personnel_number_));
+        return SendOkResponse(json::serialize(jv));
+    }
+    SendBadRequestResponseDefault();
+}
+
+void ApiHandler::HandleGetVacationForPerson() {
+    if (req_info_.method != http::verb::get && req_info_.method != http::verb::head) {
+        return SendWrongMethodResponseAllowedGetHead("Wrong method"s, true);
+    }
+    if (CheckEndPath()) {
+        json::value jv = json::value_from(application_.GetUseCases().GetVacationForPerson(personnel_number_));
+        return SendOkResponse(json::serialize(jv));
+    }
+    SendBadRequestResponseDefault();
+}
+
 void ApiHandler::HandleUpdate() {
     std::string path_part = FindAndCutTarget(req_info_);
 
@@ -612,6 +767,15 @@ void ApiHandler::HandleUpdateCompositionBusinessTrip() {
     }
     if (application_.GetUseCases().GetCountEmployees() < trip.personnel_number) {
         return SendBadRequestResponse("Ошибка ТабельныцНомер не найден"s);
+    }
+
+    int trip_id = jv.at("НомерЗаписи"s).as_int64();
+    int personnel_num = jv.at("ТабельныйНомер"s).as_int64();
+    std::string start_date_of_business_trip = application_.GetUseCases().GetStartDateOfBusinessTrip(trip_id);
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_num);
+
+    if (date_of_dismissal >= start_date_of_business_trip) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
     }
 
     try {
@@ -721,6 +885,13 @@ void ApiHandler::HandleUpdateOrder() {
 
     json::value jv = json::parse(req_info_.body);
 
+    int personnel_num = jv.at("ТабельныйНомер"s).as_int64();
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_num);
+
+    if (date_of_dismissal.has_value()) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
+    }
+
     ui::detail::OrderInfo order = json::value_to<ui::detail::OrderInfo>(jv);
     if (application_.GetUseCases().GetCountOrders() < order.order_id) {
         return SendBadRequestResponse("Ошибка НомерПриказа не найден"s);
@@ -807,6 +978,13 @@ month == "декабрь")) {
         return SendBadRequestResponse("Ошибка Месяц не существует"s);
     }
 
+    int personnel_num = jv.at("ТабельныйНомер"s).as_int64();
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_num);
+
+    if (date_of_dismissal.has_value()) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
+    }
+
     ui::detail::TimeSheetInfo time_sheet = json::value_to<ui::detail::TimeSheetInfo>(jv);
     if (application_.GetUseCases().GetCountTimeSheet() < time_sheet.time_sheet_id) {
         return SendBadRequestResponse("Ошибка НомерЗаписи не найден"s);
@@ -863,6 +1041,42 @@ void ApiHandler::HandleUpdateVacation() {
     SendBadRequestResponseDefault();
 }
 
+void ApiHandler::HandleDelete() {
+    std::string path_part = FindAndCutTarget(req_info_);
+
+    if (path_part == "/composition-business-trip"s) {
+        HandleDeleteCompositionBusinessTrip();
+    }
+    else {
+        SendNotFoundResponse();
+    }
+}
+
+void ApiHandler::HandleDeleteCompositionBusinessTrip() {
+    if (req_info_.method != http::verb::delete_) {
+        return SendWrongMethodResponseAllowedDelete("Wrong method"s, true);
+    }
+
+    json::value jv = json::parse(req_info_.body);
+    ui::detail::CompositionBusinessTripInfo trip = json::value_to<ui::detail::CompositionBusinessTripInfo>(jv);
+
+    if (application_.GetUseCases().GetCountEmployees() < trip.personnel_number) {
+        return SendBadRequestResponse("Ошибка ТабельныйНомер не найден"s);
+    }
+
+    try {
+        if (CheckEndPath()) {
+            application_.GetUseCases().DeleteCompositionBusinessTrip(trip);
+            return SendOkResponse({});
+        }
+    }
+    catch (const std::exception& e) {
+        return SendBadRequestResponse(CleanErrorMessage(e.what()));
+    }
+
+    SendBadRequestResponseDefault();
+}
+
 void ApiHandler::HandleRegister() {
     if (req_info_.method != http::verb::post) {
         return SendWrongMethodResponseAllowedPost("Wrong method"s, true);
@@ -884,9 +1098,16 @@ void ApiHandler::HandleRegister() {
     name = person.at("name").as_string();
 
     std::unordered_set<std::string> emails = application_.GetUseCases().GetEmails();
+    personnel_number_ = application_.GetUseCases().GetPersonnelNumberForEmail(email);
 
     if (!emails.contains(email)) {
         return SendBadRequestResponse("Сотрудник не найден"s);
+    }
+
+    std::optional<std::string> date_of_dismissal = application_.GetUseCases().GetDateOfDismissal(personnel_number_);
+
+    if (date_of_dismissal.has_value()) {
+        return SendBadRequestResponse("Сотрудник уволен"s);
     }
 
     std::string access_token = GetUniqueToken();
@@ -968,7 +1189,7 @@ void ApiHandler::HandleLogin() {
 
     if (persons_.contains(p)) {
         PersonInfo p_info{email, password, persons_[p], role};
-        if (tokens_.contains(p_info) && !tokens_[p_info].tracker.Has20MinutesPassed()) {
+        if (tokens_.contains(p_info)) {
             json::value jv {
                 {"success"s, true},
                 {"accessToken"s, "Bearer "s + tokens_[p_info].access_token},
@@ -981,10 +1202,8 @@ void ApiHandler::HandleLogin() {
             };
             return SendOkResponse(json::serialize(jv));
         }
-        else {
-            return SendBadRequestResponse("Token is expired"s, "tokenIsExpired"s);
-        }
     }
+
     SendNoAuthResponse("Invalid login format"s, "invalidLogin"s);
 }
 
@@ -1084,20 +1303,26 @@ void ApiHandler::HandleUser() {
 
     try {
         std::string email = auth_to_person_.at(token_str.substr(7)).email;
+        std::string password = auth_to_person_.at(token_str.substr(7)).password;
         std::string name = auth_to_person_.at(token_str.substr(7)).name;
         std::string role = auth_to_person_.at(token_str.substr(7)).role;
-
-        json::value jv = {
-            {"success"s, true},
-            {"user"s, {
-                    {"email"s, email},
-                    {"name"s, name},
-                    {"role"s, role}
-                }}
-        };
-
-        return SendOkResponse(json::serialize(jv));
-     }
+        Person p{email, password, role};
+        PersonInfo p_info{email, password, persons_[p], role};
+        if (!tokens_[p_info].tracker.Has20MinutesPassed()) {
+            json::value jv = {
+                {"success"s, true},
+                {"user"s, {
+                        {"email"s, email},
+                        {"name"s, name},
+                        {"role"s, role}
+                    }}
+            };
+            return SendOkResponse(json::serialize(jv));
+        }
+        else {
+            return SendBadRequestResponse("Token is expired"s, "tokenIsExpired"s);
+        }
+    }
     catch (...) {
         return SendBadRequestResponse("Invalid token"s, "invalidToken"s);
     }

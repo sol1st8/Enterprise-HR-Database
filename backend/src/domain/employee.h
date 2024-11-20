@@ -93,12 +93,15 @@ class Employee {
 class EmployeeRepository {
   public:
     virtual std::vector<ui::detail::EmployeeInfo> Get() const = 0;
+    virtual std::vector<ui::detail::EmployeeInfo> GetForPerson(int personnel_number) const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 
     virtual int GetCount() const = 0;
 
+    virtual std::optional<std::string> GetDateOfDismissal(int personnel_number) const = 0;
     virtual std::unordered_set<std::string> GetEmails() const = 0;
+    virtual int GetPersonnelNumberForEmail(const std::string& email) const = 0;
 
   protected:
     ~EmployeeRepository() = default;

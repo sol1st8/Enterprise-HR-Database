@@ -67,10 +67,13 @@ class BusinessTrip {
 class BusinessTripRepository {
   public:
     virtual std::vector<ui::detail::BusinessTripInfo> Get() const = 0;
+    virtual std::vector<ui::detail::BusinessTripInfo> GetForPerson(int personnel_number) const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 
     virtual int GetCount() const = 0;
+
+    virtual std::string GetStartDateOfBusinessTrip(int trip_id) const = 0;
 
   protected:
     ~BusinessTripRepository() = default;

@@ -117,6 +117,7 @@ inline std::unordered_map<PersonInfo, Tokens, PersonInfoHasher> tokens_;
 inline std::unordered_map<std::string, PersonInfo> auth_to_person_;
 inline std::unordered_map<std::string, PersonInfo> refresh_token_to_person_;
 inline std::deque<std::string> refresh_tokens_;
+inline int personnel_number_{};
 
 class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
   public:
@@ -165,6 +166,17 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     void HandleGetTimeSheet();
     void HandleGetVacations();
 
+    void HandleGetForPerson();
+    void HandleGetBusinessTripsForPerson();
+    void HandleGetCompositionBusinessTripsForPerson();
+    void HandleGetDepartmentsForPerson();
+    void HandleGetEmployeeForPerson();
+    void HandleGetJobTitlesForPerson();
+    void HandleGetOrdersForPerson();
+    void HandleGetStaffingTableForPerson();
+    void HandleGetTimeSheetForPerson();
+    void HandleGetVacationForPerson();
+
     void HandleAdd();
     void HandleAddBusinessTrip();
     void HandleAddCompositionBusinessTrip();
@@ -186,6 +198,9 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     void HandleUpdateStaffingTable();
     void HandleUpdateTimeSheet();
     void HandleUpdateVacation();
+
+    void HandleDelete();
+    void HandleDeleteCompositionBusinessTrip();
 
     void HandleRegister();
     void CreateAdmin();

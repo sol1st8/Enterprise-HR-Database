@@ -37,9 +37,18 @@ std::vector<ui::detail::BusinessTripInfo> UseCasesImpl::GetBusinessTrips() const
     return trips_.Get();
 }
 
+std::vector<ui::detail::BusinessTripInfo> UseCasesImpl::GetBusinessTripsForPerson(int personnel_number) const {
+    return trips_.GetForPerson(personnel_number);
+}
+
 void UseCasesImpl::AddCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip) {
     auto worker = composition_trips_.GetWorker();
     worker->AddCompositionBusinessTrip({trip.personnel_number, trip.trip_id});
+}
+
+void UseCasesImpl::DeleteCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip) {
+    auto worker = composition_trips_.GetWorker();
+    worker->DeleteCompositionBusinessTrip({trip.personnel_number, trip.trip_id});
 }
 
 void UseCasesImpl::UpdateCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip) {
@@ -49,6 +58,10 @@ void UseCasesImpl::UpdateCompositionBusinessTrip(const ui::detail::CompositionBu
 
 std::vector<ui::detail::CompositionBusinessTripInfo> UseCasesImpl::GetCompositionBusinessTrips() const {
     return composition_trips_.Get();
+}
+
+std::vector<ui::detail::CompositionBusinessTripInfo> UseCasesImpl::GetCompositionBusinessTripsForPerson(int personnel_number) const {
+    return composition_trips_.GetForPerson(personnel_number);
 }
 
 void UseCasesImpl::AddDepartment(const ui::detail::DepartmentInfo& dep) {
@@ -85,6 +98,10 @@ std::vector<ui::detail::EmployeeInfo> UseCasesImpl::GetEmployees() const {
     return employees_.Get();
 }
 
+std::vector<ui::detail::EmployeeInfo> UseCasesImpl::GetEmployeeForPerson(int personnel_number) const {
+    return employees_.GetForPerson(personnel_number);
+}
+
 void UseCasesImpl::AddJobTitle(const ui::detail::JobTitleInfo& job_title) {
     auto worker = job_titles_.GetWorker();
     worker->AddJobTitle({job_title.job_title_id, job_title.job_title});
@@ -111,6 +128,10 @@ void UseCasesImpl::UpdateOrder(const ui::detail::OrderInfo& order) {
 
 std::vector<ui::detail::OrderInfo> UseCasesImpl::GetOrders() const {
     return orders_.Get();
+}
+
+std::vector<ui::detail::OrderInfo> UseCasesImpl::GetOrdersForPerson(int personnel_number) const {
+    return orders_.GetForPerson(personnel_number);
 }
 
 void UseCasesImpl::AddStaffingTable(const ui::detail::StaffingTableInfo& staffing_table) {
@@ -143,6 +164,10 @@ std::vector<ui::detail::TimeSheetInfo> UseCasesImpl::GetTimeSheet() const {
     return time_sheet_.Get();
 }
 
+std::vector<ui::detail::TimeSheetInfo> UseCasesImpl::GetTimeSheetForPerson(int personnel_number) const {
+    return time_sheet_.GetForPerson(personnel_number);
+}
+
 void UseCasesImpl::AddVacation(const ui::detail::VacationInfo& vacation) {
     auto worker = vacations_.GetWorker();
     worker->AddVacation({vacation.vacation_id, vacation.personnel_number, vacation.type, vacation.from_date,
@@ -159,6 +184,10 @@ std::vector<ui::detail::VacationInfo> UseCasesImpl::GetVacations() const {
     return vacations_.Get();
 }
 
+std::vector<ui::detail::VacationInfo> UseCasesImpl::GetVacationForPerson(int personnel_number) const {
+    return vacations_.GetForPerson(personnel_number);
+}
+
 int UseCasesImpl::GetCountBusinessTrips() const { return trips_.GetCount(); }
 int UseCasesImpl::GetCountDepartments() const { return deps_.GetCount(); }
 int UseCasesImpl::GetCountEmployees() const { return employees_.GetCount(); }
@@ -172,6 +201,18 @@ std::string UseCasesImpl::GetDepartment(int id) const { return deps_.GetDep(id);
 int UseCasesImpl::GetDepartmentId(const std::string& dep) const { return deps_.GetDepId(dep); }
 
 std::unordered_set<std::string> UseCasesImpl::GetEmails() const { return employees_.GetEmails(); }
+
+std::optional<std::string>
+UseCasesImpl::GetDateOfDismissal(int personnel_num) const {
+  return employees_.GetDateOfDismissal(personnel_num);
+}
+std::string UseCasesImpl::GetStartDateOfBusinessTrip(int trip_id) const {
+  return trips_.GetStartDateOfBusinessTrip(trip_id);
+}
+
+int UseCasesImpl::GetPersonnelNumberForEmail(const std::string& email) const {
+    return employees_.GetPersonnelNumberForEmail(email);
+}
 
 std::string UseCasesImpl::GetJobTitle(int id) const { return job_titles_.GetJobTitle(id); }
 int UseCasesImpl::GetJobTitleId(const std::string& job_title) const { return job_titles_.GetJobTitleId(job_title); }
