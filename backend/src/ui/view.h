@@ -63,13 +63,13 @@ struct BusinessTripInfo {
 
 struct CompositionBusinessTripInfo {
     int personnel_number;
-    int trip_id;
+    std::variant<std::string, int> trip;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::CompositionBusinessTripInfo& trip) {
         jv = {
             {"ТабельныйНомер"s, trip.personnel_number},
-            {"НомерЗаписи"s, trip.trip_id}
+            {"НомерЗаписи"s, std::get<std::string>(trip.trip)}
         };
     }
 
@@ -79,7 +79,7 @@ struct CompositionBusinessTripInfo {
         ui::detail::CompositionBusinessTripInfo tr;
 
         tr.personnel_number = trip.at("ТабельныйНомер").as_int64();
-        tr.trip_id = trip.at("НомерЗаписи").as_int64();
+        tr.trip = static_cast<int>(trip.at("НомерЗаписи").as_int64());
 
         return tr;
     }

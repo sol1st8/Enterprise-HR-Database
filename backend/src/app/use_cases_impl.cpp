@@ -43,17 +43,17 @@ std::vector<ui::detail::BusinessTripInfo> UseCasesImpl::GetBusinessTripsForPerso
 
 void UseCasesImpl::AddCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip) {
     auto worker = composition_trips_.GetWorker();
-    worker->AddCompositionBusinessTrip({trip.personnel_number, trip.trip_id});
+    worker->AddCompositionBusinessTrip({trip.personnel_number, get<int>(trip.trip)});
 }
 
 void UseCasesImpl::DeleteCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip) {
     auto worker = composition_trips_.GetWorker();
-    worker->DeleteCompositionBusinessTrip({trip.personnel_number, trip.trip_id});
+    worker->DeleteCompositionBusinessTrip({trip.personnel_number, get<int>(trip.trip)});
 }
 
 void UseCasesImpl::UpdateCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip) {
     auto worker = composition_trips_.GetWorker();
-    worker->UpdateCompositionBusinessTrip({trip.personnel_number, trip.trip_id});
+    worker->UpdateCompositionBusinessTrip({trip.personnel_number, get<int>(trip.trip)});
 }
 
 std::vector<ui::detail::CompositionBusinessTripInfo> UseCasesImpl::GetCompositionBusinessTrips() const {
@@ -196,6 +196,9 @@ int UseCasesImpl::GetCountOrders() const { return orders_.GetCount(); }
 int UseCasesImpl::GetCountStaffingTable() const { return staffing_table_.GetCount(); }
 int UseCasesImpl::GetCountTimeSheet() const { return time_sheet_.GetCount(); }
 int UseCasesImpl::GetCountVacations() const { return vacations_.GetCount(); }
+
+std::string UseCasesImpl::GetOrganization(int trip_id) const { return trips_.GetOrganization(trip_id); }
+int UseCasesImpl::GetTripId(const std::string& organization) const { return trips_.GetTripId(organization); }
 
 std::string UseCasesImpl::GetDepartment(int id) const { return deps_.GetDep(id); }
 int UseCasesImpl::GetDepartmentId(const std::string& dep) const { return deps_.GetDepId(dep); }

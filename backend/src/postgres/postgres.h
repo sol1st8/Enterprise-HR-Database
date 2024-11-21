@@ -67,6 +67,9 @@ class BusinessTripRepositoryImpl : public domain::BusinessTripRepository {
 
     std::string GetStartDateOfBusinessTrip(int trip_id) const override;
 
+    std::string GetOrganization(int trip_id) const override;
+    int GetTripId(const std::string& organization) const override;
+
   private:
     connection_pool::ConnectionPool& pool_;
 };

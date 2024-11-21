@@ -75,6 +75,9 @@ class BusinessTripRepository {
 
     virtual std::string GetStartDateOfBusinessTrip(int trip_id) const = 0;
 
+    virtual std::string GetOrganization(int trip_id) const = 0;
+    virtual int GetTripId(const std::string& organization) const = 0;
+
   protected:
     ~BusinessTripRepository() = default;
 };

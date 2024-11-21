@@ -77,6 +77,9 @@ class UseCasesImpl : public UseCases {
     int GetCountTimeSheet() const override;
     int GetCountVacations() const override;
 
+    std::string GetOrganization(int trip_id) const override;
+    int GetTripId(const std::string& organization) const override;
+
     std::string GetDepartment(int id) const override;
     int GetDepartmentId(const std::string& dep) const override;
 

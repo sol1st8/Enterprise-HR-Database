@@ -28,6 +28,44 @@ std::string BusinessTripRepositoryImpl::GetStartDateOfBusinessTrip(int trip_id) 
     return ""s;
 }
 
+std::string BusinessTripRepositoryImpl::GetOrganization(int trip_id) const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT * FROM Командировка ORDER BY НомерЗаписи;"s;
+
+    auto resp = tr.query<int, std::string, std::string, std::string,
+                         std::string, std::string, int, std::string>(query);
+
+    for (const auto& [tr_id, country, city, organization,
+                      from_date, to_date, days, target] : resp) {
+        if (trip_id == tr_id) {
+            return organization;
+        }
+    }
+
+    return ""s;
+}
+
+int BusinessTripRepositoryImpl::GetTripId(const std::string& organization) const {
+    auto conn = pool_.GetConnection();
+    pqxx::read_transaction tr(*conn);
+
+    std::string query = "SELECT * FROM Командировка ORDER BY НомерЗаписи;"s;
+
+    auto resp = tr.query<int, std::string, std::string, std::string,
+                         std::string, std::string, int, std::string>(query);
+
+    for (const auto& [trip_id, country, city, org,
+                      from_date, to_date, days, target] : resp) {
+        if (organization == org) {
+            return trip_id;
+        }
+    }
+
+    return -1;
+}
+
 std::vector<ui::detail::BusinessTripInfo> BusinessTripRepositoryImpl::Get() const {
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
@@ -110,6 +148,8 @@ std::vector<ui::detail::CompositionBusinessTripInfo> CompositionBusinessTripRepo
     auto conn = pool_.GetConnection();
     pqxx::read_transaction tr(*conn);
 
+    BusinessTripRepositoryImpl t(pool_);
+
     std::string query = "SELECT * FROM СоставКомандировки ORDER BY ТабельныйНомер;"s;
 
     auto resp = tr.query<int, int>(query);
@@ -117,7 +157,7 @@ std::vector<ui::detail::CompositionBusinessTripInfo> CompositionBusinessTripRepo
     std::vector<ui::detail::CompositionBusinessTripInfo> result;
 
     for (const auto& [personnel_number, trip_id] : resp) {
-        ui::detail::CompositionBusinessTripInfo trip{personnel_number, trip_id};
+        ui::detail::CompositionBusinessTripInfo trip{personnel_number, t.GetOrganization(trip_id)};
         result.push_back(trip);
     }
 
@@ -130,6 +170,8 @@ std::vector<ui::detail::CompositionBusinessTripInfo> CompositionBusinessTripRepo
 
     std::string query = "SELECT * FROM СоставКомандировки ORDER BY ТабельныйНомер;"s;
 
+    BusinessTripRepositoryImpl t(pool_);
+
     auto resp = tr.query<int, int>(query);
 
     std::vector<ui::detail::CompositionBusinessTripInfo> result;
@@ -138,7 +180,7 @@ std::vector<ui::detail::CompositionBusinessTripInfo> CompositionBusinessTripRepo
         if (personnel_number != personnel_num) {
             continue;
         }
-        ui::detail::CompositionBusinessTripInfo trip{personnel_number, trip_id};
+        ui::detail::CompositionBusinessTripInfo trip{personnel_number, t.GetOrganization(trip_id)};
         result.push_back(trip);
     }
 

@@ -79,6 +79,9 @@ class UseCases {
     virtual int GetCountTimeSheet() const = 0;
     virtual int GetCountVacations() const = 0;
 
+    virtual std::string GetOrganization(int trip_id) const = 0;
+    virtual int GetTripId(const std::string& organization) const = 0;
+
     virtual std::string GetDepartment(int id) const = 0;
     virtual int GetDepartmentId(const std::string& dep) const = 0;
 

@@ -167,6 +167,13 @@ void ApiHandler::HandleAddCompositionBusinessTrip() {
         return SendBadRequestResponse("Сотрудник уволен"s);
     }
 
+    std::string organization;
+    organization = jv.at("НомерЗаписи").as_string();
+    jv.as_object()["НомерЗаписи"] = application_.GetUseCases().GetTripId(organization);
+    if (jv.at("НомерЗаписи").as_int64() == -1) {
+        return SendBadRequestResponse("Ошибка Командировка не существует"s);
+    }
+
     ui::detail::CompositionBusinessTripInfo trip = json::value_to<ui::detail::CompositionBusinessTripInfo>(jv);
 
     try {
@@ -760,9 +767,17 @@ void ApiHandler::HandleUpdateCompositionBusinessTrip() {
     }
 
     json::value jv = json::parse(req_info_.body);
+
+    std::string organization;
+    organization = jv.at("НомерЗаписи").as_string();
+    jv.as_object()["НомерЗаписи"] = application_.GetUseCases().GetTripId(organization);
+    if (jv.at("НомерЗаписи").as_int64() == -1) {
+        return SendBadRequestResponse("Ошибка Командировка не существует"s);
+    }
+
     ui::detail::CompositionBusinessTripInfo trip = json::value_to<ui::detail::CompositionBusinessTripInfo>(jv);
 
-    if (application_.GetUseCases().GetCountBusinessTrips() < trip.trip_id) {
+    if (application_.GetUseCases().GetCountBusinessTrips() < get<int>(trip.trip)) {
         return SendBadRequestResponse("Ошибка НомерЗаписи не найден"s);
     }
     if (application_.GetUseCases().GetCountEmployees() < trip.personnel_number) {
