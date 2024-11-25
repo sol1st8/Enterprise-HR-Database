@@ -27,10 +27,10 @@ void UseCasesImpl::AddBusinessTrip(const ui::detail::BusinessTripInfo& trip) {
                              trip.days, trip.target});
 }
 
-void UseCasesImpl::UpdateBusinessTrip(const ui::detail::BusinessTripInfo& trip) {
+void UseCasesImpl::UpdateBusinessTrip(const ui::detail::BusinessTripInfo& trip, int id) {
     auto worker = trips_.GetWorker();
     worker->UpdateBusinessTrip({trip.trip_id, trip.country, trip.city, trip.organization, trip.from_date, trip.to_date,
-                                trip.days, trip.target});
+                                trip.days, trip.target}, id);
 }
 
 std::vector<ui::detail::BusinessTripInfo> UseCasesImpl::GetBusinessTrips() const {
@@ -46,14 +46,14 @@ void UseCasesImpl::AddCompositionBusinessTrip(const ui::detail::CompositionBusin
     worker->AddCompositionBusinessTrip({trip.personnel_number, get<int>(trip.trip)});
 }
 
-void UseCasesImpl::DeleteCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip) {
+void UseCasesImpl::DeleteCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip, int id) {
     auto worker = composition_trips_.GetWorker();
-    worker->DeleteCompositionBusinessTrip({trip.personnel_number, get<int>(trip.trip)});
+    worker->DeleteCompositionBusinessTrip({trip.personnel_number, get<int>(trip.trip)}, id);
 }
 
-void UseCasesImpl::UpdateCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip) {
+void UseCasesImpl::UpdateCompositionBusinessTrip(const ui::detail::CompositionBusinessTripInfo& trip, int id) {
     auto worker = composition_trips_.GetWorker();
-    worker->UpdateCompositionBusinessTrip({trip.personnel_number, get<int>(trip.trip)});
+    worker->UpdateCompositionBusinessTrip({trip.personnel_number, get<int>(trip.trip)}, id);
 }
 
 std::vector<ui::detail::CompositionBusinessTripInfo> UseCasesImpl::GetCompositionBusinessTrips() const {
@@ -69,9 +69,9 @@ void UseCasesImpl::AddDepartment(const ui::detail::DepartmentInfo& dep) {
     worker->AddDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
 }
 
-void UseCasesImpl::UpdateDepartment(const ui::detail::DepartmentInfo& dep) {
+void UseCasesImpl::UpdateDepartment(const ui::detail::DepartmentInfo& dep, int id) {
     auto worker = deps_.GetWorker();
-    worker->UpdateDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num});
+    worker->UpdateDepartment({dep.department_id, dep.manager_personnel_number, dep.dep_name, dep.office_num}, id);
 }
 
 std::vector<ui::detail::DepartmentInfo> UseCasesImpl::GetDepartments() const {
@@ -86,12 +86,12 @@ void UseCasesImpl::AddEmployee(const ui::detail::EmployeeInfo& employee) {
                          employee.mail, employee.marital_status, employee.date_of_dismissal});
 }
 
-void UseCasesImpl::UpdateEmployee(const ui::detail::EmployeeInfo& employee) {
+void UseCasesImpl::UpdateEmployee(const ui::detail::EmployeeInfo& employee, int id) {
     auto worker = employees_.GetWorker();
     worker->UpdateEmployee({employee.personnel_number, employee.full_name, employee.gender,
                             std::get<int>(employee.job_title), employee.experience, employee.number,
                             employee.registration, employee.education, employee.date,
-                            employee.mail, employee.marital_status, employee.date_of_dismissal});
+                            employee.mail, employee.marital_status, employee.date_of_dismissal}, id);
 }
 
 std::vector<ui::detail::EmployeeInfo> UseCasesImpl::GetEmployees() const {
@@ -107,9 +107,9 @@ void UseCasesImpl::AddJobTitle(const ui::detail::JobTitleInfo& job_title) {
     worker->AddJobTitle({job_title.job_title_id, job_title.job_title});
 }
 
-void UseCasesImpl::UpdateJobTitle(const ui::detail::JobTitleInfo& job_title) {
+void UseCasesImpl::UpdateJobTitle(const ui::detail::JobTitleInfo& job_title, int id) {
     auto worker = job_titles_.GetWorker();
-    worker->UpdateJobTitle({job_title.job_title_id, job_title.job_title});
+    worker->UpdateJobTitle({job_title.job_title_id, job_title.job_title}, id);
 }
 
 std::vector<ui::detail::JobTitleInfo> UseCasesImpl::GetJobTitles() const {
@@ -121,9 +121,9 @@ void UseCasesImpl::AddOrder(const ui::detail::OrderInfo& order) {
     worker->AddOrder({order.order_id, order.personnel_number,order.date, order.content});
 }
 
-void UseCasesImpl::UpdateOrder(const ui::detail::OrderInfo& order) {
+void UseCasesImpl::UpdateOrder(const ui::detail::OrderInfo& order, int id) {
     auto worker = orders_.GetWorker();
-    worker->UpdateOrder({order.order_id, order.personnel_number, order.date, order.content});
+    worker->UpdateOrder({order.order_id, order.personnel_number, order.date, order.content}, id);
 }
 
 std::vector<ui::detail::OrderInfo> UseCasesImpl::GetOrders() const {
@@ -140,10 +140,10 @@ void UseCasesImpl::AddStaffingTable(const ui::detail::StaffingTableInfo& staffin
                               std::get<int>(staffing_table.department), staffing_table.salary, staffing_table.time_job});
 }
 
-void UseCasesImpl::UpdateStaffingTable(const ui::detail::StaffingTableInfo& staffing_table) {
+void UseCasesImpl::UpdateStaffingTable(const ui::detail::StaffingTableInfo& staffing_table, int id) {
     auto worker = staffing_table_.GetWorker();
     worker->UpdateStaffingTable({staffing_table.staffing_table_id, std::get<int>(staffing_table.job_title),
-                                 std::get<int>(staffing_table.department), staffing_table.salary, staffing_table.time_job});
+                                 std::get<int>(staffing_table.department), staffing_table.salary, staffing_table.time_job}, id);
 }
 
 std::vector<ui::detail::StaffingTableInfo> UseCasesImpl::GetStaffingTable() const {
@@ -155,9 +155,9 @@ void UseCasesImpl::AddTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) {
     worker->AddTimeSheet({time_sheet.time_sheet_id, time_sheet.personnel_number, time_sheet.time_worked, time_sheet.month});
 }
 
-void UseCasesImpl::UpdateTimeSheet(const ui::detail::TimeSheetInfo& time_sheet) {
+void UseCasesImpl::UpdateTimeSheet(const ui::detail::TimeSheetInfo& time_sheet, int id) {
     auto worker = time_sheet_.GetWorker();
-    worker->UpdateTimeSheet({time_sheet.time_sheet_id, time_sheet.personnel_number, time_sheet.time_worked, time_sheet.month});
+    worker->UpdateTimeSheet({time_sheet.time_sheet_id, time_sheet.personnel_number, time_sheet.time_worked, time_sheet.month}, id);
 }
 
 std::vector<ui::detail::TimeSheetInfo> UseCasesImpl::GetTimeSheet() const {
@@ -174,10 +174,10 @@ void UseCasesImpl::AddVacation(const ui::detail::VacationInfo& vacation) {
                          vacation.to_date, vacation.days, vacation.leave_basis});
 }
 
-void UseCasesImpl::UpdateVacation(const ui::detail::VacationInfo& vacation) {
+void UseCasesImpl::UpdateVacation(const ui::detail::VacationInfo& vacation, int id) {
     auto worker = vacations_.GetWorker();
     worker->UpdateVacation({vacation.vacation_id, vacation.personnel_number, vacation.type, vacation.from_date,
-                            vacation.to_date, vacation.days, vacation.leave_basis});
+                            vacation.to_date, vacation.days, vacation.leave_basis}, id);
 }
 
 std::vector<ui::detail::VacationInfo> UseCasesImpl::GetVacations() const {
@@ -207,10 +207,10 @@ std::unordered_set<std::string> UseCasesImpl::GetEmails() const { return employe
 
 std::optional<std::string>
 UseCasesImpl::GetDateOfDismissal(int personnel_num) const {
-  return employees_.GetDateOfDismissal(personnel_num);
+    return employees_.GetDateOfDismissal(personnel_num);
 }
 std::string UseCasesImpl::GetStartDateOfBusinessTrip(int trip_id) const {
-  return trips_.GetStartDateOfBusinessTrip(trip_id);
+    return trips_.GetStartDateOfBusinessTrip(trip_id);
 }
 
 int UseCasesImpl::GetPersonnelNumberForEmail(const std::string& email) const {

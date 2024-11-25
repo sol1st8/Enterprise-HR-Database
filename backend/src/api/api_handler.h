@@ -49,6 +49,25 @@ class TimeTracker {
     std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
 };
 
+struct Login {
+    std::string email;
+    std::string password;
+
+    bool operator==(const Login& other) const {
+        return email == other.email &&
+               password == other.password;
+    }
+};
+
+struct LoginHasher {
+    std::size_t operator()(const Login& login) const {
+        std::size_t h1 = std::hash<std::string>()(login.email);
+        std::size_t h2 = std::hash<std::string>()(login.password);
+
+        return h1 + h2 * 23;
+    }
+};
+
 struct Person {
     std::string email;
     std::string password;
@@ -118,6 +137,9 @@ inline std::unordered_map<std::string, PersonInfo> auth_to_person_;
 inline std::unordered_map<std::string, PersonInfo> refresh_token_to_person_;
 inline std::deque<std::string> refresh_tokens_;
 inline int personnel_number_{};
+inline std::string last_role_;
+inline std::unordered_map<Login, std::string, LoginHasher> login_to_role_;
+inline std::unordered_set<std::string> emails_;
 
 class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
   public:
@@ -132,6 +154,12 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     std::function<void(ResponseInfo)> send_;
     RequestInfo req_info_{};
     db::Application application_{GetConfigFromEnv()};
+
+    bool CheckEndPath();
+    std::string FindAndCutTarget(RequestInfo& req);
+    std::string GetIdFromTarget(const std::string& target);
+
+    void HandleApiResponse();
 
     std::random_device random_device_;
     std::mt19937_64 generator1_{[this] {
@@ -151,31 +179,7 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
         return stream.str();
     }
 
-    bool CheckEndPath();
-    std::string FindAndCutTarget(RequestInfo& req);
-    void HandleApiResponse();
-
-    void HandleGet();
-    void HandleGetBusinessTrips();
-    void HandleGetCompositionBusinessTrips();
-    void HandleGetDepartments();
-    void HandleGetEmployees();
-    void HandleGetJobTitles();
-    void HandleGetOrders();
-    void HandleGetStaffingTable();
-    void HandleGetTimeSheet();
-    void HandleGetVacations();
-
-    void HandleGetForPerson();
-    void HandleGetBusinessTripsForPerson();
-    void HandleGetCompositionBusinessTripsForPerson();
-    void HandleGetDepartmentsForPerson();
-    void HandleGetEmployeeForPerson();
-    void HandleGetJobTitlesForPerson();
-    void HandleGetOrdersForPerson();
-    void HandleGetStaffingTableForPerson();
-    void HandleGetTimeSheetForPerson();
-    void HandleGetVacationForPerson();
+    void HandleOptions();
 
     void HandleAdd();
     void HandleAddBusinessTrip();
@@ -188,26 +192,36 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     void HandleAddTimeSheet();
     void HandleAddVacation();
 
+    void HandleGet();
+    void HandleGetBusinessTrips();
+    void HandleGetCompositionBusinessTrips();
+    void HandleGetDepartments();
+    void HandleGetEmployees();
+    void HandleGetJobTitles();
+    void HandleGetOrders();
+    void HandleGetStaffingTable();
+    void HandleGetTimeSheet();
+    void HandleGetVacations();
+
     void HandleUpdate();
-    void HandleUpdateBusinessTrip();
-    void HandleUpdateCompositionBusinessTrip();
-    void HandleUpdateDepartment();
-    void HandleUpdateEmployee();
-    void HandleUpdateJobTitle();
-    void HandleUpdateOrder();
-    void HandleUpdateStaffingTable();
-    void HandleUpdateTimeSheet();
-    void HandleUpdateVacation();
+    void HandleUpdateBusinessTrip(int id);
+    void HandleUpdateCompositionBusinessTrip(int id);
+    void HandleUpdateDepartment(int id);
+    void HandleUpdateEmployee(int id);
+    void HandleUpdateJobTitle(int id);
+    void HandleUpdateOrder(int id);
+    void HandleUpdateStaffingTable(int id);
+    void HandleUpdateTimeSheet(int id);
+    void HandleUpdateVacation(int id);
 
     void HandleDelete();
-    void HandleDeleteCompositionBusinessTrip();
+    void HandleDeleteCompositionBusinessTrip(int id);
 
     void HandleRegister();
-    void CreateAdmin();
+    PersonInfo CreateAdmin();
     void HandleLogin();
     void HandleLogout();
     void HandleToken();
-    void HandleOptions();
     void HandleUser();
 
     template <typename Body, typename Allocator>
@@ -228,8 +242,8 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
                             const std::string& key = "Something wrong with token"s, bool no_cache = true);
 
     void SendWrongMethodResponseAllowedDelete(const std::string& message = "Only DELETE method is expected"s, bool no_cache = true);
-    void SendWrongMethodResponseAllowedGetHead (const std::string& message = "Only GET/HEAD method is expected"s,
-                                                bool no_cache = true);
+    void SendWrongMethodResponseAllowedGetHead(const std::string& message = "Only GET/HEAD method is expected"s,
+                                               bool no_cache = true);
     void SendWrongMethodResponseAllowedPost(const std::string& message = "Only POST method is expected"s, bool no_cache = true);
     void SendWrongMethodResponseAllowedPut(const std::string& message = "Only PUT method is expected"s, bool no_cache = true);
 };
