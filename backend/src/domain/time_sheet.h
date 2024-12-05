@@ -11,10 +11,11 @@ class Worker;
 class TimeSheet {
   public:
     TimeSheet(int time_sheet_id, int personnel_number,
-              int time_worked, std::string month) : time_sheet_id_(time_sheet_id)
-                                                  , personnel_number_(personnel_number)
-                                                  , time_worked_(time_worked)
-                                                  , month_(std::move(month)) {}
+              int time_worked, std::string month, std::string year) : time_sheet_id_(time_sheet_id)
+                                                                    , personnel_number_(personnel_number)
+                                                                    , time_worked_(time_worked)
+                                                                    , month_(std::move(month))
+                                                                    , year_(std::move(year)) {}
 
     int GetTimeSheetId() const noexcept {
         return time_sheet_id_;
@@ -32,11 +33,16 @@ class TimeSheet {
         return month_;
     }
 
+    const std::string& GetYear() const noexcept {
+        return year_;
+    }
+
   private:
     int time_sheet_id_;
     int personnel_number_;
     int time_worked_;
     std::string month_;
+    std::string year_;
 };
 
 class TimeSheetRepository {

@@ -87,7 +87,7 @@ struct CompositionBusinessTripInfo {
 
 struct DepartmentInfo {
     int department_id;
-    int manager_personnel_number;
+    std::variant<std::string, int> manager_personnel;
     std::string dep_name;
     int office_num;
 
@@ -95,7 +95,7 @@ struct DepartmentInfo {
                             const ui::detail::DepartmentInfo& department) {
         jv = {
             {"КодОтдела"s, department.department_id},
-            {"ТабельныйНомерРуководителя"s, department.manager_personnel_number},
+            {"ТабельныйНомерРуководителя"s, std::get<std::string>(department.manager_personnel)},
             {"Название"s, department.dep_name},
             {"НомерКабинета"s, department.office_num}
         };
@@ -107,7 +107,7 @@ struct DepartmentInfo {
         ui::detail::DepartmentInfo dep;
 
         dep.department_id = department.at("КодОтдела").as_int64();
-        dep.manager_personnel_number = department.at("ТабельныйНомерРуководителя").as_int64();
+        dep.manager_personnel = static_cast<int>(department.at("ТабельныйНомерРуководителя").as_int64());
         dep.dep_name = department.at("Название").as_string();
         dep.office_num = department.at("НомерКабинета").as_int64();
 
@@ -119,7 +119,9 @@ struct EmployeeInfo {
     int personnel_number;
     std::string full_name;
     std::string gender;
+    std::string birthday;
     std::variant<std::string, int> job_title;
+    std::variant<std::string, int> department;
     std::optional<int> experience;
     std::string number;
     std::string registration;
@@ -135,7 +137,9 @@ struct EmployeeInfo {
             {"ТабельныйНомер"s, employee.personnel_number},
             {"ФИО"s, employee.full_name},
             {"Пол"s, employee.gender},
+            {"ДатаРождения", employee.birthday},
             {"КодДолжности"s, std::get<std::string>(employee.job_title)},
+            {"КодОтдела"s, std::get<std::string>(employee.department)},
             {"Стаж"s, employee.experience ? std::to_string(*employee.experience) : "NULL"s},
             {"Телефон"s, employee.number},
             {"Прописка"s, employee.registration},
@@ -155,7 +159,9 @@ struct EmployeeInfo {
         emp.personnel_number = employee.at("ТабельныйНомер").as_int64();
         emp.full_name = employee.at("ФИО").as_string();
         emp.gender = employee.at("Пол").as_string();
+        emp.birthday = employee.at("ДатаРождения").as_string();
         emp.job_title = static_cast<int>(employee.at("КодДолжности").as_int64());
+        emp.department = static_cast<int>(employee.at("КодОтдела").as_int64());
         if (employee.as_object().if_contains("Стаж")) {
             if (employee.at("Стаж").is_int64()) {
                 emp.experience = employee.at("Стаж").as_int64();
@@ -175,6 +181,33 @@ struct EmployeeInfo {
         emp.marital_status = employee.at("СемейноеПоложение").as_string();
 
         return emp;
+    }
+};
+
+struct FreeJobTitleInfo {
+    std::variant<std::string, int> job_title;
+    std::variant<std::string, int> department;
+    int free_job;
+
+    friend void tag_invoke(json::value_from_tag, json::value& jv,
+                           const ui::detail::FreeJobTitleInfo& free_job_title) {
+        jv = {
+            {"КодДолжности"s, std::get<std::string>(free_job_title.job_title)},
+            {"КодОтдела"s, std::get<std::string>(free_job_title.department)},
+            {"СвободныеВакансии"s, free_job_title.free_job}
+        };
+    }
+
+    friend ui::detail::FreeJobTitleInfo
+    tag_invoke(json::value_to_tag<ui::detail::FreeJobTitleInfo>&, const json::value&
+               free_job_title) {
+        ui::detail::FreeJobTitleInfo free_j_title;
+
+        free_j_title.job_title = static_cast<int>(free_job_title.at("КодДолжности").as_int64());
+        free_j_title.department = static_cast<int>(free_job_title.at("КодОтдела").as_int64());
+        free_j_title.free_job = free_job_title.at("СвободныеВакансии").as_int64();
+
+        return free_j_title;
     }
 };
 
@@ -269,6 +302,7 @@ struct TimeSheetInfo {
     int personnel_number;
     int time_worked;
     std::string month;
+    std::string year;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::TimeSheetInfo& time_sheet) {
@@ -276,7 +310,8 @@ struct TimeSheetInfo {
             {"НомерЗаписи"s, time_sheet.time_sheet_id},
             {"ТабельныйНомер"s, time_sheet.personnel_number},
             {"ОтработанноеВремя"s, time_sheet.time_worked},
-            {"Месяц"s, time_sheet.month}
+            {"Месяц"s, time_sheet.month},
+            {"Год"s, time_sheet.year}
         };
     }
 
@@ -289,6 +324,7 @@ struct TimeSheetInfo {
         time_s.personnel_number = time_sheet.at("ТабельныйНомер").as_int64();
         time_s.time_worked = time_sheet.at("ОтработанноеВремя").as_int64();
         time_s.month = time_sheet.at("Месяц").as_string();
+        time_s.year = time_sheet.at("Год").as_string();
 
         return time_s;
     }
@@ -302,6 +338,7 @@ struct VacationInfo {
     std::string to_date;
     int days;
     std::string leave_basis;
+    std::string status;
 
     friend void tag_invoke(json::value_from_tag, json::value& jv,
                            const ui::detail::VacationInfo& vacation) {
@@ -312,7 +349,8 @@ struct VacationInfo {
             {"ДатаОтпуска"s, vacation.from_date},
             {"ДатаОкончания"s, vacation.to_date},
             {"КоличествоДней"s, vacation.days},
-            {"Основание"s, vacation.leave_basis}
+            {"Основание"s, vacation.leave_basis},
+            {"Статус", vacation.status}
         };
     }
 
@@ -328,6 +366,7 @@ struct VacationInfo {
         vac.type = vacation.at("ВидОтпуска").as_string();
         vac.days = vacation.at("КоличествоДней").as_int64();
         vac.leave_basis = vacation.at("Основание").as_string();
+        vac.status = vacation.at("Статус").as_string();
 
         return vac;
     }

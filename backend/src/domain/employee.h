@@ -11,13 +11,15 @@ class Worker;
 
 class Employee {
   public:
-    Employee(int personnel_number, std::string full_name, std::string gender,
-             int job_title_id, std::optional<int> experience, std::string number,
+    Employee(int personnel_number, std::string full_name, std::string gender, std::string birthday,
+             int job_title_id, int department_id, std::optional<int> experience, std::string number,
              std::string registration, std::string education, std::string date,
              std::string mail, std::string marital_status, std::optional<std::string> date_of_dismissal) : personnel_number_(personnel_number)
                                                                                                          , full_name_(std::move(full_name))
+                                                                                                         , birthday_(std::move(birthday))
                                                                                                          , gender_(std::move(gender))
                                                                                                          , job_title_id_(job_title_id)
+                                                                                                         , department_id_(department_id)
                                                                                                          , experience_(experience)
                                                                                                          , number_(std::move(number))
                                                                                                          , registration_(std::move(registration))
@@ -39,8 +41,16 @@ class Employee {
         return gender_;
     }
 
+    const std::string& GetBirthday() const noexcept {
+        return birthday_;
+    }
+
     int GetJobTitleId() const noexcept {
         return job_title_id_;
+    }
+
+    int GetDepartmentId() const noexcept {
+        return department_id_;
     }
 
     std::optional<int> GetExperience() const noexcept {
@@ -79,7 +89,9 @@ class Employee {
     int personnel_number_;
     std::string full_name_;
     std::string gender_;
+    std::string birthday_;
     int job_title_id_;
+    int department_id_;
     std::optional<int> experience_;
     std::string number_;
     std::string registration_;
@@ -94,6 +106,7 @@ class EmployeeRepository {
   public:
     virtual std::vector<ui::detail::EmployeeInfo> Get() const = 0;
     virtual std::vector<ui::detail::EmployeeInfo> GetForPerson(int personnel_number) const = 0;
+    virtual std::vector<ui::detail::FreeJobTitleInfo> GetFreeJobTitles() const = 0;
 
     virtual std::shared_ptr<domain::Worker> GetWorker() const = 0;
 
@@ -102,6 +115,9 @@ class EmployeeRepository {
     virtual std::optional<std::string> GetDateOfDismissal(int personnel_number) const = 0;
     virtual std::unordered_set<std::string> GetEmails() const = 0;
     virtual int GetPersonnelNumberForEmail(const std::string& email) const = 0;
+
+    virtual std::string GetFio(int id) const = 0;
+    virtual int GetId(const std::string& fio) const = 0;
 
   protected:
     ~EmployeeRepository() = default;

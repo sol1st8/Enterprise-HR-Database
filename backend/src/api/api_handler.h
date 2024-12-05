@@ -197,6 +197,7 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
     void HandleGetCompositionBusinessTrips();
     void HandleGetDepartments();
     void HandleGetEmployees();
+    void HandleGetFreeJobTitles();
     void HandleGetJobTitles();
     void HandleGetOrders();
     void HandleGetStaffingTable();
@@ -216,6 +217,7 @@ class ApiHandler : public std::enable_shared_from_this<ApiHandler> {
 
     void HandleDelete();
     void HandleDeleteCompositionBusinessTrip(int id);
+    void HandleDeleteVacation(int id);
 
     void HandleRegister();
     PersonInfo CreateAdmin();

@@ -1,6 +1,7 @@
 #include "api_handler.h"
 
 #include <algorithm>
+#include <string>
 
 namespace {
 
@@ -421,6 +422,13 @@ void ApiHandler::HandleAddVacation() {
         return SendBadRequestResponse("Ошибка КоличествоДней <= 0"s);
     }
 
+    std::string status;
+    status = jv.at("Статус").as_string();
+
+    if (!(status == "принято"s || status == "не принято"s)) {
+        return SendBadRequestResponse("Ошибка Статус не корректный"s);
+    }
+
     std::string from_date;
     std::string to_date;
     from_date = jv.at("ДатаОтпуска").as_string();
@@ -465,6 +473,9 @@ void ApiHandler::HandleGet() {
     }
     else if (path_part == "/employee"s) {
         HandleGetEmployees();
+    }
+    else if (path_part == "/free-job-title"s) {
+        HandleGetFreeJobTitles();
     }
     else if (path_part == "/job-title"s) {
         HandleGetJobTitles();
@@ -537,6 +548,17 @@ void ApiHandler::HandleGetEmployees() {
             return SendOkResponse(json::serialize(jv));
         }
         json::value jv = json::value_from(application_.GetUseCases().GetEmployeeForPerson(personnel_number_));
+        return SendOkResponse(json::serialize(jv));
+    }
+    SendBadRequestResponseDefault();
+}
+
+void ApiHandler::HandleGetFreeJobTitles() {
+    if (req_info_.method != http::verb::get && req_info_.method != http::verb::head) {
+        return SendWrongMethodResponseAllowedGetHead("Wrong method"s, true);
+    }
+    if (CheckEndPath()) {
+        json::value jv = json::value_from(application_.GetUseCases().GetFreeJobTitles());
         return SendOkResponse(json::serialize(jv));
     }
     SendBadRequestResponseDefault();
@@ -702,7 +724,7 @@ void ApiHandler::HandleUpdateCompositionBusinessTrip(int id) {
     }
 
     json::value jv = json::parse(req_info_.body);
-    jv.as_object()["НомерЗаписи"] = id;
+    jv.as_object()["ТабельныйНомер"] = id;
 
     std::string organization;
     organization = jv.at("НомерЗаписи").as_string();
@@ -713,10 +735,10 @@ void ApiHandler::HandleUpdateCompositionBusinessTrip(int id) {
 
     ui::detail::CompositionBusinessTripInfo trip = json::value_to<ui::detail::CompositionBusinessTripInfo>(jv);
 
-    if (application_.GetUseCases().GetCountBusinessTrips() < id) {
+    if (application_.GetUseCases().GetCountBusinessTrips() < get<int>(trip.trip)) {
         return SendBadRequestResponse("Ошибка НомерЗаписи не найден"s);
     }
-    if (application_.GetUseCases().GetCountEmployees() < trip.personnel_number) {
+    if (application_.GetUseCases().GetCountEmployees() < id) {
         return SendBadRequestResponse("Ошибка ТабельныцНомер не найден"s);
     }
 
@@ -997,6 +1019,13 @@ void ApiHandler::HandleUpdateVacation(int id) {
         return SendBadRequestResponse("Ошибка ДатаОтпуска >= ДатаОкончания"s);
     }
 
+    std::string status;
+    status = jv.at("Статус").as_string();
+
+    if (!(status == "принято"s || status == "не принято"s)) {
+        return SendBadRequestResponse("Ошибка Статус не корректный"s);
+    }
+
     ui::detail::VacationInfo vacation = json::value_to<ui::detail::VacationInfo>(jv);
     if (application_.GetUseCases().GetCountVacations() < id) {
         return SendBadRequestResponse("Ошибка НомерЗаписи не найден"s);
@@ -1025,6 +1054,9 @@ void ApiHandler::HandleDelete() {
 
     if (path_part == "/composition-business-trip"s) {
         HandleDeleteCompositionBusinessTrip(id);
+    }
+    else if (path_part == "/vacation"s) {
+        HandleDeleteVacation(id);
     }
     else {
         SendNotFoundResponse();
@@ -1055,6 +1087,42 @@ void ApiHandler::HandleDeleteCompositionBusinessTrip(int id) {
 
     try {
         application_.GetUseCases().DeleteCompositionBusinessTrip(trip, id);
+        return SendOkResponse({});
+    }
+    catch (const std::exception& e) {
+        return SendBadRequestResponse(CleanErrorMessage(e.what()));
+    }
+
+    SendBadRequestResponseDefault();
+}
+
+void ApiHandler::HandleDeleteVacation(int id) {
+    if (req_info_.method != http::verb::delete_ && req_info_.method != http::verb::options) {
+        return SendWrongMethodResponseAllowedDelete("Wrong method"s, true);
+    }
+
+    if (req_info_.method == http::verb::options) {
+        return HandleOptions();
+    }
+
+    json::value jv = json::parse(req_info_.body);
+    jv.as_object()["НомерЗаписи"] = id;
+
+    std::string status;
+    status = jv.at("Статус").as_string();
+
+    if (status != "не принято"s) {
+        return SendBadRequestResponse("Ошибка Статус не корректный"s);
+    }
+
+    ui::detail::VacationInfo vacation = json::value_to<ui::detail::VacationInfo>(jv);
+
+    if (application_.GetUseCases().GetCountVacations() < id) {
+        return SendBadRequestResponse("Ошибка НомерЗаписи не найден"s);
+    }
+
+    try {
+        application_.GetUseCases().DeleteVacation(vacation, id);
         return SendOkResponse({});
     }
     catch (const std::exception& e) {

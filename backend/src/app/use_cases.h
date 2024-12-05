@@ -13,6 +13,7 @@ struct BusinessTripInfo;
 struct CompositionBusinessTripInfo;
 struct DepartmentInfo;
 struct EmployeeInfo;
+struct FreeJobTitleInfo;
 struct JobTitleInfo;
 struct OrderInfo;
 struct StaffingTableInfo;
@@ -46,6 +47,7 @@ class UseCases {
     virtual void UpdateEmployee(const ui::detail::EmployeeInfo& employee, int id) = 0;
     virtual std::vector<ui::detail::EmployeeInfo> GetEmployees() const = 0;
     virtual std::vector<ui::detail::EmployeeInfo> GetEmployeeForPerson(int personnel_number) const = 0;
+    virtual std::vector<ui::detail::FreeJobTitleInfo> GetFreeJobTitles() const = 0;
 
     virtual void AddJobTitle(const ui::detail::JobTitleInfo& job_title) = 0;
     virtual void UpdateJobTitle(const ui::detail::JobTitleInfo& job_title, int id) = 0;
@@ -66,6 +68,7 @@ class UseCases {
     virtual std::vector<ui::detail::TimeSheetInfo> GetTimeSheetForPerson(int personnel_number) const = 0;
 
     virtual void AddVacation(const ui::detail::VacationInfo& vacation) = 0;
+    virtual void DeleteVacation(const ui::detail::VacationInfo& vacation, int id) = 0;
     virtual void UpdateVacation(const ui::detail::VacationInfo& vacation, int id) = 0;
     virtual std::vector<ui::detail::VacationInfo> GetVacations() const = 0;
     virtual std::vector<ui::detail::VacationInfo> GetVacationForPerson(int personnel_number) const = 0;
@@ -84,6 +87,9 @@ class UseCases {
 
     virtual std::string GetDepartment(int id) const = 0;
     virtual int GetDepartmentId(const std::string& dep) const = 0;
+
+    virtual std::string GetFio(int id) const = 0;
+    virtual int GetId(const std::string& fio) const = 0;
 
     virtual std::unordered_set<std::string> GetEmails() const = 0;
 

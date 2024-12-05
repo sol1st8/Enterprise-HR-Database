@@ -44,6 +44,7 @@ class UseCasesImpl : public UseCases {
     void UpdateEmployee(const ui::detail::EmployeeInfo& employee, int id) override;
     std::vector<ui::detail::EmployeeInfo> GetEmployees() const override;
     std::vector<ui::detail::EmployeeInfo> GetEmployeeForPerson(int personnel_number) const override;
+    std::vector<ui::detail::FreeJobTitleInfo> GetFreeJobTitles() const override;
 
     void AddJobTitle(const ui::detail::JobTitleInfo& job_title) override;
     void UpdateJobTitle(const ui::detail::JobTitleInfo& job_title, int id) override;
@@ -64,6 +65,7 @@ class UseCasesImpl : public UseCases {
     std::vector<ui::detail::TimeSheetInfo> GetTimeSheetForPerson(int personnel_number) const override;
 
     void AddVacation(const ui::detail::VacationInfo& vacation) override;
+    void DeleteVacation(const ui::detail::VacationInfo& vacation, int id) override;
     void UpdateVacation(const ui::detail::VacationInfo& vacation, int id) override;
     std::vector<ui::detail::VacationInfo> GetVacations() const override;
     std::vector<ui::detail::VacationInfo> GetVacationForPerson(int personnel_number) const override;
@@ -82,6 +84,9 @@ class UseCasesImpl : public UseCases {
 
     std::string GetDepartment(int id) const override;
     int GetDepartmentId(const std::string& dep) const override;
+
+    std::string GetFio(int id) const override;
+    int GetId(const std::string& fio) const override;
 
     std::unordered_set<std::string> GetEmails() const override;
 

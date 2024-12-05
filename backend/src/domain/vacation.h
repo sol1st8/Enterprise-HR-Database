@@ -12,13 +12,14 @@ class Vacation {
   public:
     Vacation(int vacation_id, int personnel_number, std::string type,
              std::string from_date, std::string to_date,
-             int days, std::string leave_basis) : vacation_id_(vacation_id)
-                                                , personnel_number_(personnel_number)
-                                                , type_(std::move(type))
-                                                , from_date_(std::move(from_date))
-                                                , to_date_(std::move(to_date))
-                                                , days_(days)
-                                                , leave_basis_(std::move(leave_basis)) {}
+             int days, std::string leave_basis, std::string status) : vacation_id_(vacation_id)
+                                                                    , personnel_number_(personnel_number)
+                                                                    , type_(std::move(type))
+                                                                    , from_date_(std::move(from_date))
+                                                                    , to_date_(std::move(to_date))
+                                                                    , days_(days)
+                                                                    , leave_basis_(std::move(leave_basis))
+                                                                    , status_(std::move(status)) {}
 
     int GetVacationId() const noexcept {
         return vacation_id_;
@@ -44,8 +45,12 @@ class Vacation {
         return days_;
     }
 
-    std::string GetLeaveBasis() const noexcept {
+    const std::string GetLeaveBasis() const noexcept {
         return leave_basis_;
+    }
+
+    const std::string GetStatus() const noexcept {
+        return status_;
     }
 
   private:
@@ -56,6 +61,7 @@ class Vacation {
     std::string to_date_;
     int days_;
     std::string leave_basis_;
+    std::string status_;
 };
 
 class VacationRepository {

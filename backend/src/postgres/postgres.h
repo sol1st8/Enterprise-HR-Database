@@ -42,6 +42,7 @@ class WorkerImpl : public domain::Worker {
     void UpdateTimeSheet(const domain::TimeSheet& time_sheet, int id) override;
 
     void AddVacation(const domain::Vacation& vacation) override;
+    void DeleteVacation(const domain::Vacation& vacation, int id) override;
     void UpdateVacation(const domain::Vacation& vacation, int id) override;
 
     ~WorkerImpl() override;
@@ -118,6 +119,7 @@ class EmployeeRepositoryImpl : public domain::EmployeeRepository {
 
     std::vector<ui::detail::EmployeeInfo> Get() const override;
     std::vector<ui::detail::EmployeeInfo> GetForPerson(int personnel_number) const override;
+    std::vector<ui::detail::FreeJobTitleInfo> GetFreeJobTitles() const override;
 
     std::shared_ptr<domain::Worker> GetWorker() const override {
         auto conn = pool_.GetConnection();
@@ -129,6 +131,9 @@ class EmployeeRepositoryImpl : public domain::EmployeeRepository {
     std::optional<std::string> GetDateOfDismissal(int personnel_number) const override;
     std::unordered_set<std::string> GetEmails() const override;
     int GetPersonnelNumberForEmail(const std::string& email) const override;
+
+    std::string GetFio(int id) const override;
+    int GetId(const std::string& fio) const override;
 
   private:
     connection_pool::ConnectionPool& pool_;

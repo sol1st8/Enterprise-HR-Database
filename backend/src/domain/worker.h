@@ -41,6 +41,7 @@ class Worker {
     virtual void UpdateTimeSheet(const domain::TimeSheet& time_sheet, int id) = 0;
 
     virtual void AddVacation(const domain::Vacation& vacation) = 0;
+    virtual void DeleteVacation(const domain::Vacation& vacation, int id) = 0;
     virtual void UpdateVacation(const domain::Vacation& vacation, int id) = 0;
 
   protected:
